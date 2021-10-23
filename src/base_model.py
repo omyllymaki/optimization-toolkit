@@ -1,4 +1,5 @@
 import logging
+from abc import abstractmethod
 from functools import partial
 from typing import Tuple
 
@@ -6,33 +7,40 @@ import numpy as np
 
 from src.gss import gss
 from src.model import Model
-from src.utils import diff, gradient, pseudoinverse
+from src.utils import diff
 
 logger = logging.getLogger(__name__)
 
 
-class DampedGN(Model):
+class BaseModel(Model):
 
     def __init__(self,
                  feval,
                  ferr=diff,
                  cost_diff_tol=1e-6,
                  cost_tol=1e-6,
-                 df_search_tol=0.05,
+                 df_search_max_iter=10,
                  min_iter=5,
-                 max_iter=100):
+                 max_iter=100,
+                 df_min=0.0,
+                 df_max=1.0):
         super().__init__(feval, ferr)
         self.cost_diff_tol = cost_diff_tol
         self.cost_tol = cost_tol
-        self.df_search_tol = df_search_tol
+        self.df_search_max_iter = df_search_max_iter
         self.min_iter = min_iter
         self.max_iter = max_iter
+        self.df_min = df_min
+        self.df_max = df_max
+
+    @abstractmethod
+    def _calculate_update_direction(self, param, x, y) -> np.ndarray:
+        raise NotImplementedError
 
     def update(self, param, x, y) -> Tuple[np.ndarray, float]:
-        errors = self._calculate_errors(param, x, y)
-        f = partial(self._calculate_errors, x=x, y=y)
-        jacobian = gradient(param, f)
-        delta = pseudoinverse(jacobian) @ errors
+
+        # Find direction for param update
+        delta = self._calculate_update_direction(param, x, y)
 
         # Find damping factor (step size) that approximately minimizes cost in determined direction
         damping_factor = self._find_damping_factor(param, x, y, delta)
@@ -70,7 +78,7 @@ class DampedGN(Model):
 
     def _find_damping_factor(self, param, x, y, delta):
         f = partial(self._calculate_damping_factor_cost, param=param, delta=delta, x=x, y=y)
-        d_min, d_max = gss(f, 0.0, 1.0, self.df_search_tol)
+        d_min, d_max = gss(f, self.df_min, self.df_max, max_iter=self.df_search_max_iter)
         return (d_min + d_max) / 2
 
     def _calculate_damping_factor_cost(self, damping_factor, param, delta, x, y):
