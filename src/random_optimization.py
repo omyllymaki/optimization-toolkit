@@ -16,8 +16,8 @@ class RandomOptimization(Model):
         super().__init__(feval, ferr, fcost)
         self.fscaling = fscaling
 
-    def update(self, param, x, y, k, cost) -> Tuple[np.ndarray, float]:
-        scale_factors = self.fscaling(k)
+    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
+        scale_factors = self.fscaling(iteration_round)
         param_candidate = param + scale_factors * np.random.randn(param.shape[0])
         errors = self._errors(param_candidate, x, y)
         candidate_cost = self._cost(errors)

@@ -25,7 +25,7 @@ class GaussNewton(Model):
         self.df_min = df_min
         self.df_max = df_max
 
-    def update(self, param, x, y, k, cost) -> Tuple[np.ndarray, float]:
+    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
         param_delta = self._calculate_update_direction(param, x, y)
         step_size = self._find_step_size(param, x, y, param_delta)
         param = param - step_size * param_delta

@@ -12,7 +12,7 @@ class Model(ABC):
         self.fcost = fcost
 
     @abstractmethod
-    def update(self, param, x, y, k, cost) -> Tuple[np.ndarray, float]:
+    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
         raise NotImplementedError
 
     def _errors(self, param, x, y) -> np.ndarray:
