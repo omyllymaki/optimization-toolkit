@@ -23,9 +23,10 @@ class Optimizer:
         costs, params = [], []
         min_cost = np.inf
         round_counter = 0
+        cost = np.inf
         while True:
 
-            param, cost = self.model.update(param, x, y, round_counter)
+            param, cost = self.model.update(param, x, y, round_counter, cost)
             costs.append(cost)
             params.append(param)
             logger.info(f"Round {round_counter}: cost {cost:0.5f}")

@@ -30,7 +30,7 @@ def check_termination(costs: np.ndarray, parameters: TerminationCriteria) -> boo
         logger.info("Cost smaller than tolerance. Fit terminated.")
         return True
     if k >= parameters.max_iter:
-        logger.info("Max number of iterations reached. Fit didn't converge.")
+        logger.info("Max number of iterations reached.")
         return True
 
     return False
