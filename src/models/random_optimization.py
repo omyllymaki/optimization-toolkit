@@ -2,7 +2,7 @@ from typing import Tuple, Callable
 
 import numpy as np
 
-from src.model import Model
+from src.models.model import Model
 from src.utils import diff, rmse
 
 

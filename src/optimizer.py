@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from src.model import Model
+from src.models.model import Model
 from src.termination import TerminationCriteria, check_termination
 
 logger = logging.getLogger(__name__)

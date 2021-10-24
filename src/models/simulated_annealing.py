@@ -4,7 +4,7 @@ from typing import Tuple
 
 import numpy as np
 
-from src.model import Model
+from src.models.model import Model
 from src.utils import diff, rmse
 
 logger = logging.getLogger(__name__)

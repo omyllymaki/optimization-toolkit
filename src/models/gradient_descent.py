@@ -4,14 +4,14 @@ from typing import Tuple
 
 import numpy as np
 
-from src.gss import gss
-from src.model import Model
-from src.utils import diff, gradient, pseudoinverse, mse
+from src.models.gss import gss
+from src.models.model import Model
+from src.utils import gradient, diff, mse
 
 logger = logging.getLogger(__name__)
 
 
-class GaussNewton(Model):
+class GradientDescent(Model):
 
     def __init__(self,
                  feval,
@@ -35,10 +35,8 @@ class GaussNewton(Model):
         return param, cost
 
     def _calculate_update_direction(self, param, x, y) -> np.ndarray:
-        errors = self._errors(param, x, y)
-        f = partial(self._errors, x=x, y=y)
-        jacobian = gradient(param, f)
-        return pseudoinverse(jacobian) @ errors
+        f = lambda p: self._cost(self._errors(p, x, y))
+        return gradient(param, f)
 
     def _find_step_size(self, param, x, y, delta):
         if self.df_search_max_iter == 0:

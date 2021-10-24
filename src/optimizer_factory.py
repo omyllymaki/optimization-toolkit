@@ -1,10 +1,10 @@
 from enum import Enum
 
-from src.gauss_newton import GaussNewton
-from src.gradient_descent import GradientDescent
+from src.models.gauss_newton import GaussNewton
+from src.models.gradient_descent import GradientDescent
 from src.optimizer import Optimizer
-from src.random_optimization import RandomOptimization
-from src.simulated_annealing import SimulatedAnnealing
+from src.models.random_optimization import RandomOptimization
+from src.models.simulated_annealing import SimulatedAnnealing
 from src.termination import TerminationCriteria
 
 Method = Enum('Method', 'gn gd ro sa')
