@@ -7,6 +7,12 @@ from src.utils import diff, rmse
 
 
 class RandomOptimization(Model):
+    """
+    Random optimization model.
+
+    Create new parameter values candidate by adding a normally distributed random vector to the current parameter
+    values. Update the current parameter values if cost of candidate is smaller than the current cost.
+    """
 
     def __init__(self,
                  feval,

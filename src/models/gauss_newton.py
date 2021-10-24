@@ -12,6 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 class GaussNewton(Model):
+    """
+    Gauss-Newton model.
+
+    Minimize sum(residual^2) by optimizing parameters using damped Gauss-Newton method.
+    """
 
     def __init__(self,
                  feval,

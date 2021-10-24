@@ -1,18 +1,44 @@
 from abc import abstractmethod, ABC
-from typing import Tuple
+from typing import Tuple, Callable
 
 import numpy as np
 
 
 class Model(ABC):
+    """
+    Base model class for optimization.
 
-    def __init__(self, feval, ferr, fcost):
+    Inheritors need to implement update function that updates parameters that needs to be solved.
+    """
+
+    def __init__(self, feval: Callable, ferr: Callable, fcost: Callable):
+        """
+        @param feval:  Function for evaluation: y_estimate = feval(x, param).
+        @param ferr:  Function to calculate errors: errors = ferr(y_estimate, y).
+        @param fcost: Function to calculate cost: cost = fcost(errors).
+        """
         self.feval = feval
         self.ferr = ferr
         self.fcost = fcost
 
     @abstractmethod
-    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
+    def update(self,
+               param: np.ndarray,
+               x: np.ndarray,
+               y: np.ndarray,
+               iteration_round: int,
+               cost: float) -> Tuple[np.ndarray, float]:
+        """
+        Update parameter that needs to be solved. Inheritors need to implement this.
+
+        @param param: Current parameter values.
+        @param x: Independent variables.
+        @param y: Dependent variables.
+        @param iteration_round:  Current iteration round.
+        @param cost: Current cost.
+
+        @return Tuple containing updated parameters and new cost for updated parameters.
+        """
         raise NotImplementedError
 
     def _errors(self, param, x, y) -> np.ndarray:

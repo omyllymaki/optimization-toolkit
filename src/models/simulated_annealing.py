@@ -11,6 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 class SimulatedAnnealing(Model):
+    """
+    Simulated annealing model.
+
+    Generate new parameter candidate. Replace the current parameters with the candidate with probability that depends on
+    cost difference and temperature.
+    """
 
     def __init__(self,
                  feval,
