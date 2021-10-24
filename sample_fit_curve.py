@@ -3,8 +3,6 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.damped_gn import DampedGN
-from src.optimizer import Optimizer
 from src.optimizer_factory import get_optimizer, Method
 
 logging.basicConfig(level=logging.INFO)
@@ -24,7 +22,7 @@ def main():
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = 1000000 * np.random.random(len(PARAMETERS))
-    optimizer = get_optimizer(method=Method.dgn, feval=feval)
+    optimizer = get_optimizer(method=Method.gn, feval=feval)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = feval(x, param)
 

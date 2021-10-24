@@ -30,3 +30,7 @@ def pseudoinverse(x: np.ndarray) -> np.ndarray:
 
 def diff(y_fit, y):
     return y_fit - y
+
+
+def rmse(errors):
+    return np.sqrt(np.sum(errors ** 2))

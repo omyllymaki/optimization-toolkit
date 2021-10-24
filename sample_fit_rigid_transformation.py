@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
-from src.damped_gn import DampedGN
-from src.optimizer import Optimizer
 from src.optimizer_factory import Method, get_optimizer
+from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
@@ -54,7 +53,11 @@ def main():
         source = feval(target, param_true) + NOISE * np.random.randn(50, 3)
 
         init_guess = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        optimizer = get_optimizer(method=Method.gd, feval=feval, ferr=ferr, max_iter=300, df_max=0.1)
+        optimizer = get_optimizer(method=Method.gd,
+                                  termination_criteria=TerminationCriteria(max_iter=300),
+                                  feval=feval,
+                                  ferr=ferr,
+                                  df_max=0.1)
         t1 = time.time()
         param, costs, _ = optimizer.fit(source, target, init_guess)
         t2 = time.time()

@@ -13,9 +13,5 @@ class Model(ABC):
         self.ferr = ferr
 
     @abstractmethod
-    def check_termination(self, costs: np.ndarray) -> bool:
-        raise NotImplementedError
-
-    @abstractmethod
-    def update(self, param, x, y) -> Tuple[np.ndarray, float]:
+    def update(self, param, x, y, k) -> Tuple[np.ndarray, float]:
         raise NotImplementedError

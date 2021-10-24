@@ -6,12 +6,12 @@ import numpy as np
 
 from src.gss import gss
 from src.model import Model
-from src.utils import gradient, diff, rmse
+from src.utils import diff, rmse, gradient, pseudoinverse
 
 logger = logging.getLogger(__name__)
 
 
-class GradientDescent(Model):
+class GaussNewton(Model):
 
     def __init__(self,
                  feval,
@@ -34,8 +34,10 @@ class GradientDescent(Model):
         return param, cost
 
     def _calculate_update_direction(self, param, x, y) -> np.ndarray:
-        cost_calculation = lambda p: rmse(self._calculate_errors(p, x, y))
-        return gradient(param, cost_calculation)
+        errors = self._calculate_errors(param, x, y)
+        f = partial(self._calculate_errors, x=x, y=y)
+        jacobian = gradient(param, f)
+        return pseudoinverse(jacobian) @ errors
 
     def _calculate_errors(self, param, x, y) -> np.ndarray:
         y_eval = self.feval(x, param)
