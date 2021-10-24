@@ -6,7 +6,7 @@ import numpy as np
 
 from src.gss import gss
 from src.model import Model
-from src.utils import diff, rmse, gradient, pseudoinverse
+from src.utils import diff, gradient, pseudoinverse, mse
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class GaussNewton(Model):
     def __init__(self,
                  feval,
                  ferr=diff,
-                 fcost=rmse,
+                 fcost=mse,
                  df_search_max_iter=10,
                  df_min=0.0,
                  df_max=1.0):

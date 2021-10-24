@@ -6,7 +6,7 @@ import numpy as np
 
 from src.gss import gss
 from src.model import Model
-from src.utils import gradient, diff, rmse
+from src.utils import gradient, diff, mse
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class GradientDescent(Model):
     def __init__(self,
                  feval,
                  ferr=diff,
-                 fcost=rmse,
+                 fcost=mse,
                  df_search_max_iter=10,
                  df_min=0.0,
                  df_max=1.0):

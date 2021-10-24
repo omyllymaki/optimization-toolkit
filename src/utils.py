@@ -33,4 +33,8 @@ def diff(y_fit, y):
 
 
 def rmse(errors):
-    return np.sqrt(np.sum(errors ** 2))
+    return np.sqrt(mse(errors))
+
+
+def mse(errors):
+    return np.mean(errors ** 2)
