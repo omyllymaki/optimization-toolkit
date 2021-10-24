@@ -28,7 +28,7 @@ def main():
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = np.zeros(3)
-    criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf)
+    criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf, max_iter_without_improvement=200)
     optimizer = get_optimizer(method=Method.sa, feval=feval, fupdate=fupdate, termination_criteria=criteria)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = feval(x, param)
