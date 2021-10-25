@@ -15,10 +15,16 @@ class RandomOptimization(Model):
     """
 
     def __init__(self,
-                 feval,
+                 feval: Callable,
                  fscaling: Callable,
-                 ferr=diff,
-                 fcost=rmse):
+                 ferr: Callable = diff,
+                 fcost: Callable = rmse):
+        """
+        @param feval: See Model.
+        @param fscaling: Function to scaling of parameter update: scale_factors = fscaling(iter_round)
+        @param ferr: See Model.
+        @param fcost: see Model.
+        """
         super().__init__(feval, ferr, fcost)
         self.fscaling = fscaling
 

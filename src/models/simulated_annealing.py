@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import Tuple
+from typing import Tuple, Callable
 
 import numpy as np
 
@@ -19,13 +19,21 @@ class SimulatedAnnealing(Model):
     """
 
     def __init__(self,
-                 feval,
-                 fupdate,
-                 ferr=diff,
-                 fcost=rmse,
-                 max_temperature=1.0,
-                 decay_constant=0.005,
+                 feval: Callable,
+                 fupdate: Callable,
+                 ferr: Callable = diff,
+                 fcost: Callable = rmse,
+                 max_temperature: float = 1.0,
+                 decay_constant: float = 0.005,
                  ):
+        """
+        @param feval: See Model.
+        @param fupdate: Function to generate param candidate: param_candidate = fupdate(param, iter_round)
+        @param ferr: See Model.
+        @param fcost: See Model.
+        @param max_temperature: Maximum temperature.
+        @param decay_constant: Decay constant for temperature.
+        """
         super().__init__(feval, ferr, fcost)
         self.fupdate = fupdate
         self.max_temperature = max_temperature
