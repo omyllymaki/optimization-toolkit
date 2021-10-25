@@ -45,5 +45,5 @@ class Model(ABC):
         y_eval = self.feval(x, param)
         return self.ferr(y_eval, y)
 
-    def _cost(self, errors):
+    def _cost(self, errors) -> float:
         return self.fcost(errors)
