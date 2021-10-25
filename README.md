@@ -27,7 +27,7 @@ Given independent variables x, dependent variables y, and functions (feval, ferr
 - errors = ferr(y_estimate, y)
 - cost = fcost(errors)
 
-Solve optimal parameter that will minimize the cost, using selected optimization method.
+Solve optimal parameters that will minimize the cost, using selected optimization method.
 
 ## Usage example
 
