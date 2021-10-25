@@ -47,8 +47,8 @@ class GaussNewton(Model):
         self.step_size_ub = step_size_ub
         self.weights = None
 
-    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
-        if iteration_round == 0:
+    def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
+        if iter_round == 0:
             self.weights = np.ones(y.shape[0])
 
         param_delta = self._calculate_update_direction(param, x, y)

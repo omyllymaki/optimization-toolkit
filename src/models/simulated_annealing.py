@@ -39,9 +39,9 @@ class SimulatedAnnealing(Model):
         self.max_temperature = max_temperature
         self.decay_constant = decay_constant
 
-    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
-        temperature = self._schedule(iteration_round)
-        param_candidate = self.fupdate(param.copy(), iteration_round)
+    def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
+        temperature = self._schedule(iter_round)
+        param_candidate = self.fupdate(param.copy(), iter_round)
         errors = self._errors(param_candidate, x, y)
         param_candidate_cost = self.fcost(errors)
         delta_cost = param_candidate_cost - cost

@@ -26,7 +26,7 @@ class Model(ABC):
                param: np.ndarray,
                x: np.ndarray,
                y: np.ndarray,
-               iteration_round: int,
+               iter_round: int,
                cost: float) -> Tuple[np.ndarray, float]:
         """
         Update parameter that needs to be solved. Inheritors need to implement this.
@@ -34,7 +34,7 @@ class Model(ABC):
         @param param: Current parameter values.
         @param x: Independent variables.
         @param y: Dependent variables.
-        @param iteration_round:  Current iteration round.
+        @param iter_round:  Current iteration round.
         @param cost: Current cost.
 
         @return Tuple containing updated parameters and new cost for updated parameters.

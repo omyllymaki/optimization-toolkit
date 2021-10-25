@@ -38,8 +38,8 @@ class GradientDescent(Model):
         self.step_size_lb = None
         self.step_size_ub = None
 
-    def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
-        self.step_size_lb, self.step_size_ub = self.fstep(iteration_round)
+    def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
+        self.step_size_lb, self.step_size_ub = self.fstep(iter_round)
         logger.debug(f"Step size range: [{self.step_size_lb}, {self.step_size_ub}]")
         param_delta = self._calculate_update_direction(param, x, y)
         step_size = self._find_step_size(param, x, y, param_delta)

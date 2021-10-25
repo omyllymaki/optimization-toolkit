@@ -42,15 +42,15 @@ class Optimizer:
         final_param = init_guess
         costs, params = [], []
         min_cost = np.inf
-        round_counter = 0
+        iter_round = 0
         cost = np.inf
         while True:
 
-            param, cost = self.model.update(param, x, y, round_counter, cost)
+            param, cost = self.model.update(param, x, y, iter_round, cost)
             costs.append(cost)
             params.append(param)
-            logger.info(f"Round {round_counter}: cost {cost:0.5f}")
-            round_counter += 1
+            logger.info(f"Round {iter_round}: cost {cost:0.5f}")
+            iter_round += 1
 
             if cost < min_cost:
                 min_cost = cost
