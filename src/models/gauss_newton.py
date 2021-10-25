@@ -36,7 +36,7 @@ class GaussNewton(Model):
         @param ferr: See Model.
         @param fcost: See Model.
         @param fweights: Function to calculate weights for LS fit: weights = fweights(errors)
-        @param step_size_max_iter: Maximum number of iterations for optimal step size search.
+        @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
         @param step_size_ub: Upper bound for step size.
         """
