@@ -53,11 +53,11 @@ def main():
         source = feval(target, param_true) + NOISE * np.random.randn(50, 3)
 
         init_guess = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        optimizer = get_optimizer(method=Method.gd,
+        optimizer = get_optimizer(method=Method.GD,
                                   termination_criteria=TerminationCriteria(max_iter=300),
                                   feval=feval,
                                   ferr=ferr,
-                                  df_max=0.1)
+                                  step_size_ub=0.1)
         t1 = time.time()
         param, costs, _ = optimizer.fit(source, target, init_guess)
         t2 = time.time()

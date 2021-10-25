@@ -1,5 +1,4 @@
 import logging
-import time
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -52,7 +51,7 @@ for f, dim in fset:
         print(f"Test run {k}")
         true_param = np.random.randn(dim)
         y = f(x, true_param)
-        optimizer = get_optimizer(method=Method.gn, feval=f, df_search_max_iter=20)
+        optimizer = get_optimizer(method=Method.GN, feval=f, step_size_max_iter=20)
         for i in range(50):
             init_guess = np.random.rand(dim)
             param, costs, _ = optimizer.fit(x, y, init_guess)

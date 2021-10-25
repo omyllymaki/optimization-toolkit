@@ -23,13 +23,13 @@ class GradientDescent(Model):
                  feval,
                  ferr=diff,
                  fcost=mse,
-                 df_search_max_iter=10,
-                 df_min=0.0,
-                 df_max=1.0):
+                 step_size_max_iter=10,
+                 step_size_lb=0.0,
+                 step_size_ub=1.0):
         super().__init__(feval, ferr, fcost)
-        self.df_search_max_iter = df_search_max_iter
-        self.df_min = df_min
-        self.df_max = df_max
+        self.step_size_max_iter = step_size_max_iter
+        self.step_size_lb = step_size_lb
+        self.step_size_ub = step_size_ub
 
     def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
         param_delta = self._calculate_update_direction(param, x, y)
@@ -45,13 +45,13 @@ class GradientDescent(Model):
         return gradient(param, f)
 
     def _find_step_size(self, param, x, y, delta):
-        if self.df_search_max_iter == 0:
-            return (self.df_min + self.df_max) / 2
-        f = partial(self._calculate_damping_factor_cost, param=param, delta=delta, x=x, y=y)
-        d_min, d_max = gss(f, self.df_min, self.df_max, max_iter=self.df_search_max_iter)
+        if self.step_size_max_iter == 0:
+            return (self.step_size_lb + self.step_size_ub) / 2
+        f = partial(self._calculate_step_size_cost, param=param, delta=delta, x=x, y=y)
+        d_min, d_max = gss(f, self.step_size_lb, self.step_size_ub, max_iter=self.step_size_max_iter)
         return (d_min + d_max) / 2
 
-    def _calculate_damping_factor_cost(self, damping_factor, param, delta, x, y):
-        param_candidate = param - damping_factor * delta
+    def _calculate_step_size_cost(self, step_size, param, delta, x, y):
+        param_candidate = param - step_size * delta
         errors = self._errors(param_candidate, x, y)
         return self._cost(errors)

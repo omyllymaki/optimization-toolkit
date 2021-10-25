@@ -22,7 +22,7 @@ def main():
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = 1000000 * np.random.random(len(PARAMETERS))
-    optimizer = get_optimizer(method=Method.gn, feval=feval)
+    optimizer = get_optimizer(method=Method.GN, feval=feval)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = feval(x, param)
 

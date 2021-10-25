@@ -1,6 +1,6 @@
 # Optimization toolkit
 
-Different optimization algos written in Python from scratch.
+Home for different numerical optimization algos written in Python from scratch.
 
 ## Requirements
 
@@ -19,6 +19,16 @@ To run samples, install also additional requirements:
 pip3 install -r requirements.txt
 ```
 
+## What does this do?
+
+Given independent variables x, dependent variables y, and functions (feval, ferr, fcost), 
+
+- y_estimate = feval(x, param)
+- errors = ferr(y_estimate, y)
+- cost = fcost(errors)
+
+Solve optimal param that will minimize the cost, using selected optimization method.
+
 ## Usage example
 
 ```
@@ -26,7 +36,7 @@ pip3 install -r requirements.txt
 def feval(x, param):
     ...
 
-optimizer = get_optimizer(method=Method.gn, feval=feval)
+optimizer = get_optimizer(method=Method.GN, feval=feval)
 param, costs, _ = optimizer.fit(x, y, init_guess)
 y_estimate = feval(x, param)
 ```

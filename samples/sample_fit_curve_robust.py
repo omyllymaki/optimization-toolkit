@@ -40,23 +40,23 @@ def main():
     init_guess = np.zeros(2)
     criteria = TerminationCriteria(max_iter=200)
     step_size = 1e-5
-    optimizer_robust = get_optimizer(method=Method.gd,
+    optimizer_robust = get_optimizer(method=Method.GD,
                                      feval=feval,
                                      fcost=trimmed_cost,
                                      termination_criteria=criteria,
-                                     df_max=step_size,
-                                     df_min=0,
-                                     df_search_max_iter=10)
+                                     step_size_ub=step_size,
+                                     step_size_lb=0,
+                                     step_size_max_iter=10)
     param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
     y_estimate_robust = feval(x, param_robust)
 
-    optimizer = get_optimizer(method=Method.gd,
+    optimizer = get_optimizer(method=Method.GD,
                               feval=feval,
                               fcost=mse,
                               termination_criteria=criteria,
-                              df_max=step_size,
-                              df_min=0,
-                              df_search_max_iter=10)
+                              step_size_ub=step_size,
+                              step_size_lb=0,
+                              step_size_max_iter=10)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = feval(x, param)
 
