@@ -40,12 +40,12 @@ def main():
     init_guess = np.zeros(2)
     criteria = TerminationCriteria(max_iter=200)
     step_size = 1e-5
+    fstep = lambda _: (0, step_size)
     optimizer_robust = get_optimizer(method=Method.GD,
                                      feval=feval,
                                      fcost=trimmed_cost,
                                      termination_criteria=criteria,
-                                     step_size_ub=step_size,
-                                     step_size_lb=0,
+                                     fstep=fstep,
                                      step_size_max_iter=10)
     param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
     y_estimate_robust = feval(x, param_robust)
@@ -54,8 +54,7 @@ def main():
                               feval=feval,
                               fcost=mse,
                               termination_criteria=criteria,
-                              step_size_ub=step_size,
-                              step_size_lb=0,
+                              fstep=fstep,
                               step_size_max_iter=10)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = feval(x, param)
@@ -69,7 +68,7 @@ def main():
     plt.ylabel("Y")
     plt.legend()
     plt.subplot(1, 2, 2)
-    plt.plot(costs_robust, "b-", label="Robust fit")
+    plt.plot(costs_robust, "r-", label="Robust fit")
     plt.plot(costs, "g-", label="Normal fit")
     plt.yscale("log")
     plt.legend()
