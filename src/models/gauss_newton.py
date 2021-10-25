@@ -35,7 +35,7 @@ class GaussNewton(Model):
         @param feval: See Model.
         @param ferr: See Model.
         @param fcost: See Model.
-        @param fweights: Function to calculate diagonal weights matrix for LS fit: weights = fweights(errors)
+        @param fweights: Function to calculate weights for LS fit: weights = fweights(errors)
         @param step_size_max_iter: Maximum number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
         @param step_size_ub: Upper bound for step size.
@@ -49,13 +49,13 @@ class GaussNewton(Model):
 
     def update(self, param, x, y, iteration_round, cost) -> Tuple[np.ndarray, float]:
         if iteration_round == 0:
-            self.weights = np.diag(np.ones(y.shape[0]))
+            self.weights = np.ones(y.shape[0])
 
         param_delta = self._calculate_update_direction(param, x, y)
         step_size = self._find_step_size(param, x, y, param_delta)
         param = param - step_size * param_delta
         errors = self._errors(param, x, y)
-        cost = self._cost(self.weights @ errors)
+        cost = self._cost(self.weights * errors)
         logger.debug(f"Cost {cost:0.3f}, step size {step_size:0.3f}")
 
         if self.fweights is not None:
@@ -67,7 +67,8 @@ class GaussNewton(Model):
         errors = self._errors(param, x, y)
         f = partial(self._errors, x=x, y=y)
         jac = gradient(param, f)
-        return pinv(jac.T @ self.weights @ jac) @ jac.T @ self.weights @ errors
+        w = np.diag(self.weights)
+        return pinv(jac.T @ w @ jac) @ jac.T @ w @ errors
 
     def _find_step_size(self, param, x, y, delta):
         if self.step_size_max_iter == 0:
@@ -79,4 +80,4 @@ class GaussNewton(Model):
     def _calculate_step_size_cost(self, step_size, param, delta, x, y):
         param_candidate = param - step_size * delta
         errors = self._errors(param_candidate, x, y)
-        return self._cost(self.weights @ errors)
+        return self._cost(self.weights * errors)

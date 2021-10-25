@@ -25,7 +25,7 @@ def fweights(errors, eps, p):
     abs_errors[abs_errors < eps] = eps
     weights = abs_errors ** (p - 2)
     weights_normalized = len(weights) * weights / np.sum(weights)
-    return np.diag(weights_normalized)
+    return weights_normalized
 
 
 def feval(x, coeff):
