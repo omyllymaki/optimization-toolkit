@@ -38,12 +38,14 @@ class Optimizer:
         @return: Tuple containing
         (final solution for parameters, costs from iteration, list of parameter values from iteration)
         """
-        param = init_guess
-        final_param = init_guess
-        costs, params = [], []
-        min_cost = np.inf
+        param = init_guess.copy()
+        final_param = init_guess.copy()
+        errors = self.model._errors(param, x, y)
+        cost = self.model._cost(errors)
+        min_cost = cost
+        costs = [cost]
+        params = [param]
         iter_round = 0
-        cost = np.inf
         while True:
 
             param, cost = self.model.update(param, x, y, iter_round, cost)
