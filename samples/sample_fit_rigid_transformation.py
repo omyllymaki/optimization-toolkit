@@ -90,7 +90,7 @@ def main():
         plt.plot(target[:, 0], target[:, 1], "r.", alpha=0.5)
         plt.title(f"{rmse:0.2f} | {duration_ms:0.1f} ms")
 
-        plt.pause(0.5)
+        plt.pause(0.1)
 
     plt.show()
 
