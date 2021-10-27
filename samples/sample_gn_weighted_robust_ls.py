@@ -4,7 +4,7 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.optimizer_factory import get_optimizer, Method
+from src.gauss_newton import GaussNewton
 from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
@@ -46,19 +46,17 @@ def main():
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=50, cost_diff_threshold=-np.inf)
 
-    optimizer_robust = get_optimizer(method=Method.GN,
-                                     f_eval=f_eval,
-                                     f_weights=partial(f_weights, p=1.0, eps=1e-6),
-                                     termination_criteria=criteria,
-                                     step_size_max_iter=0)
+    optimizer_robust = GaussNewton(f_eval=f_eval,
+                                   f_weights=partial(f_weights, p=1.0, eps=1e-6),
+                                   termination=criteria,
+                                   step_size_max_iter=0)
     param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
-    optimizer = get_optimizer(method=Method.GN,
-                              f_eval=f_eval,
-                              f_weights=None,
-                              termination_criteria=criteria,
-                              step_size_max_iter=0)
+    optimizer = GaussNewton(f_eval=f_eval,
+                            f_weights=None,
+                            termination=criteria,
+                            step_size_max_iter=0)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 

@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.optimizer_factory import get_optimizer, Method
+from src.random_optimization import RandomOptimization
 from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +28,7 @@ def main():
 
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf)
-    optimizer = get_optimizer(method=Method.RO, f_eval=f_eval, f_scaling=f_scaling, termination_criteria=criteria)
+    optimizer = RandomOptimization(f_eval=f_eval, f_scaling=f_scaling, termination=criteria)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 

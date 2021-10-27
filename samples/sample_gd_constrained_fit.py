@@ -4,9 +4,8 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.optimizer_factory import get_optimizer, Method
+from src.gradient_descent import GradientDescent
 from src.termination import TerminationCriteria
-from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
 
@@ -44,11 +43,10 @@ def main():
     init_guess = - np.random.rand(3)
     max_iter = 5000
     criteria = TerminationCriteria(max_iter=max_iter, cost_diff_threshold=-np.inf, max_iter_without_improvement=1000)
-    optimizer = get_optimizer(method=Method.GD,
-                              f_eval=f_eval,
-                              f_cost=partial(f_cost, neg_penalty=1e8),
-                              termination_criteria=criteria,
-                              f_step=partial(f_step, max_iter=max_iter, max_step=1e-9))
+    optimizer = GradientDescent(f_eval=f_eval,
+                                f_cost=partial(f_cost, neg_penalty=1e8),
+                                termination=criteria,
+                                f_step=partial(f_step, max_iter=max_iter, max_step=1e-9))
     param, costs, params = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 

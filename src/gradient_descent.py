@@ -4,14 +4,15 @@ from typing import Tuple
 
 import numpy as np
 
-from src.models.gss import gss
-from src.models.model import Model
+from src.gss import gss
+from src.optimizer import Optimizer
+from src.termination import TerminationCriteria as TC
 from src.utils import gradient, diff, mse
 
 logger = logging.getLogger(__name__)
 
 
-class GradientDescent(Model):
+class GradientDescent(Optimizer):
     """
     Gradient descent model.
 
@@ -24,15 +25,21 @@ class GradientDescent(Model):
                  f_eval,
                  f_err=diff,
                  f_cost=mse,
-                 step_size_max_iter=5):
+                 step_size_max_iter=5,
+                 termination=TC(max_iter=10000,
+                                max_iter_without_improvement=1000,
+                                cost_threshold=1e-6,
+                                cost_diff_threshold=np.inf)
+                 ):
         """
         @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)
-        @param f_eval: See Model
-        @param f_err: See Model.
-        @param f_cost: See Model.
+        @param f_eval: See Optimizer
+        @param f_err: See Optimizer.
+        @param f_cost: See Optimizer.
         @param step_size_max_iter: Number of iterations for optimal step size search.
+        @param termination: See Optimizer.
         """
-        super().__init__(f_eval, f_err, f_cost)
+        super().__init__(f_eval, f_err, f_cost, termination)
         self.f_step = f_step
         self.step_size_max_iter = step_size_max_iter
         self.step_size_lb = None

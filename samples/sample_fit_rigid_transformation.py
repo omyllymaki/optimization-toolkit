@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
-from src.optimizer_factory import Method, get_optimizer
+from src.gradient_descent import GradientDescent
 from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
@@ -54,11 +54,10 @@ def main():
 
         init_guess = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         f_step = lambda _: (0, 0.1)
-        optimizer = get_optimizer(method=Method.GD,
-                                  termination_criteria=TerminationCriteria(max_iter=300),
-                                  f_eval=f_eval,
-                                  f_err=f_err,
-                                  f_step=f_step)
+        optimizer = GradientDescent(termination=TerminationCriteria(max_iter=300),
+                                    f_eval=f_eval,
+                                    f_err=f_err,
+                                    f_step=f_step)
         t1 = time.time()
         param, costs, _ = optimizer.fit(source, target, init_guess)
         t2 = time.time()

@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.optimizer_factory import get_optimizer, Method
+from src.gradient_descent import GradientDescent
 from src.termination import TerminationCriteria
 from src.utils import mse
 
@@ -41,21 +41,19 @@ def main():
     criteria = TerminationCriteria(max_iter=200)
     step_size = 1e-5
     f_step = lambda _: (0, step_size)
-    optimizer_robust = get_optimizer(method=Method.GD,
-                                     f_eval=f_eval,
-                                     f_cost=trimmed_cost,
-                                     termination_criteria=criteria,
-                                     f_step=f_step,
-                                     step_size_max_iter=10)
+    optimizer_robust = GradientDescent(f_eval=f_eval,
+                                       f_cost=trimmed_cost,
+                                       termination=criteria,
+                                       f_step=f_step,
+                                       step_size_max_iter=10)
     param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
-    optimizer = get_optimizer(method=Method.GD,
-                              f_eval=f_eval,
-                              f_cost=mse,
-                              termination_criteria=criteria,
-                              f_step=f_step,
-                              step_size_max_iter=10)
+    optimizer = GradientDescent(f_eval=f_eval,
+                                f_cost=mse,
+                                termination=criteria,
+                                f_step=f_step,
+                                step_size_max_iter=10)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 

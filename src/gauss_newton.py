@@ -1,18 +1,19 @@
 import logging
 from functools import partial
-from typing import Tuple, Callable
+from typing import Tuple, Callable, List
 
 import numpy as np
 from numpy.linalg import pinv
 
-from src.models.gss import gss
-from src.models.model import Model
+from src.gss import gss
+from src.optimizer import Optimizer
+from src.termination import TerminationCriteria as TC
 from src.utils import diff, gradient, mse
 
 logger = logging.getLogger(__name__)
 
 
-class GaussNewton(Model):
+class GaussNewton(Optimizer):
     """
     Gauss-Newton model.
 
@@ -30,17 +31,23 @@ class GaussNewton(Model):
                  f_weights: Callable = None,
                  step_size_max_iter: int = 10,
                  step_size_lb: float = 0.0,
-                 step_size_ub: float = 1.0):
+                 step_size_ub: float = 1.0,
+                 termination=TC(max_iter=500,
+                                cost_threshold=1e-6,
+                                cost_diff_threshold=1e-9)
+                 ):
         """
-        @param f_eval: See Model.
-        @param f_err: See Model.
-        @param f_cost: See Model.
+        @param f_eval: See Optimizer.
+        @param f_err: See Optimizer.
+        @param f_cost: See Optimizer.
         @param f_weights: Function to calculate weights for LS fit: weights = f_weights(errors)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
         @param step_size_ub: Upper bound for step size.
+        @param step_size_ub: Upper bound for step size.
+        @param termination: See Optimizer.
         """
-        super().__init__(f_eval, f_err, f_cost)
+        super().__init__(f_eval, f_err, f_cost, termination)
         self.f_weights = f_weights
         self.step_size_max_iter = step_size_max_iter
         self.step_size_lb = step_size_lb

@@ -2,11 +2,12 @@ from typing import Tuple, Callable
 
 import numpy as np
 
-from src.models.model import Model
-from src.utils import diff, rmse
+from src.optimizer import Optimizer
+from src.termination import TerminationCriteria as TC
+from src.utils import diff, mse
 
 
-class RandomOptimization(Model):
+class RandomOptimization(Optimizer):
     """
     Random optimization model.
 
@@ -18,14 +19,20 @@ class RandomOptimization(Model):
                  f_eval: Callable,
                  f_scaling: Callable,
                  f_err: Callable = diff,
-                 f_cost: Callable = rmse):
+                 f_cost: Callable = mse,
+                 termination=TC(max_iter=10000,
+                                max_iter_without_improvement=2000,
+                                cost_threshold=1e-6,
+                                cost_diff_threshold=np.inf)
+                 ):
         """
-        @param f_eval: See Model.
+        @param f_eval: See Optimizer.
         @param f_scaling: Function to scaling of parameter update: scale_factors = f_scaling(iter_round)
-        @param f_err: See Model.
-        @param f_cost: see Model.
+        @param f_err: See Optimizer.
+        @param f_cost: see Optimizer.
+        @param termination: See Optimizer.
         """
-        super().__init__(f_eval, f_err, f_cost)
+        super().__init__(f_eval, f_err, f_cost, termination)
         self.f_scaling = f_scaling
 
     def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:

@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.optimizer_factory import get_optimizer, Method
+from src.gauss_newton import GaussNewton
 
 logging.basicConfig(level=logging.INFO)
 
@@ -51,7 +51,7 @@ for f, dim in fset:
         print(f"Test run {k}")
         true_param = np.random.randn(dim)
         y = f(x, true_param)
-        optimizer = get_optimizer(method=Method.GN, f_eval=f, step_size_max_iter=20)
+        optimizer = GaussNewton(f_eval=f, step_size_max_iter=20)
         for i in range(50):
             init_guess = np.random.rand(dim)
             param, costs, _ = optimizer.fit(x, y, init_guess)

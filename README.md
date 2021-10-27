@@ -21,7 +21,7 @@ pip3 install -r requirements.txt
 
 ## What does this do?
 
-Given independent variables x, dependent variables y, and functions (f_eval, f_err, f_cost), 
+Given independent variables x, dependent variables y, termination criteria, and functions (f_eval, f_err, f_cost), 
 
 - y_estimate = f_eval(x, parameters)
 - errors = f_err(y_estimate, y)
@@ -33,12 +33,12 @@ Solve optimal parameters that will minimize the cost, using selected optimizatio
 
 ```
 # Specify function you want to fit
-def feval(x, param):
+def f_eval(x, param):
     ...
 
-optimizer = get_optimizer(method=Method.GN, feval=feval)
+optimizer = GaussNewton(f_eval=f_eval)
 param, costs, _ = optimizer.fit(x, y, init_guess)
-y_estimate = feval(x, param)
+y_estimate = f_eval(x, param)
 ```
 
 Samples folder contains multiple samples. Run all samples by typing:

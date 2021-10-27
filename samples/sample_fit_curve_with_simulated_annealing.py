@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.optimizer_factory import get_optimizer, Method
+from src.simulated_annealing import SimulatedAnnealing
 from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +29,7 @@ def main():
 
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf, max_iter_without_improvement=200)
-    optimizer = get_optimizer(method=Method.SA, f_eval=f_eval, f_update=f_update, termination_criteria=criteria)
+    optimizer = SimulatedAnnealing(f_eval=f_eval, f_update=f_update, termination=criteria)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 

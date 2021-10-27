@@ -4,7 +4,8 @@ from typing import Tuple, Callable
 
 import numpy as np
 
-from src.models.model import Model
+from src.optimizer import Optimizer
+from src.termination import TerminationCriteria as TC
 from src.utils import diff, rmse
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ def acceptance_probability(delta_cost: float, temperature: float) -> float:
         return np.exp(-delta_cost / temperature)
 
 
-class SimulatedAnnealing(Model):
+class SimulatedAnnealing(Optimizer):
     """
     Simulated annealing model.
 
@@ -43,16 +44,21 @@ class SimulatedAnnealing(Model):
                  f_cost: Callable = rmse,
                  f_temp: Callable = temp_decay,
                  f_prob: Callable = acceptance_probability,
+                 termination=TC(max_iter=10000,
+                                max_iter_without_improvement=2000,
+                                cost_threshold=1e-6,
+                                cost_diff_threshold=np.inf)
                  ):
         """
-        @param f_eval: See Model.
+        @param f_eval: See Optimizer.
         @param f_update: Function to generate param candidate: param_candidate = f_update(param, iter_round)
-        @param f_err: See Model.
-        @param f_cost: See Model.
+        @param f_err: See Optimizer.
+        @param f_cost: See Optimizer.
         @param f_temp: Function to calculate current temperature from iteration round: temp = f_temp(iter_round)
         @param f_prob: Function to calculate acceptance probability for param candidate: prob = f_prob(delta_cost, temp)
+        @param termination: See Optimizer.
         """
-        super().__init__(f_eval, f_err, f_cost)
+        super().__init__(f_eval, f_err, f_cost, termination)
         self.f_update = f_update
         self.f_temp = f_temp
         self.f_prob = f_prob
