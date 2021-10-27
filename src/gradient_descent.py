@@ -29,7 +29,7 @@ class GradientDescent(Optimizer):
                  termination=TC(max_iter=10000,
                                 max_iter_without_improvement=1000,
                                 cost_threshold=1e-6,
-                                cost_diff_threshold=np.inf)
+                                cost_diff_threshold=-np.inf)
                  ):
         """
         @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)

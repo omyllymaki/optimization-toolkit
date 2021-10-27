@@ -47,7 +47,7 @@ class SimulatedAnnealing(Optimizer):
                  termination=TC(max_iter=10000,
                                 max_iter_without_improvement=2000,
                                 cost_threshold=1e-6,
-                                cost_diff_threshold=np.inf)
+                                cost_diff_threshold=-np.inf)
                  ):
         """
         @param f_eval: See Optimizer.
