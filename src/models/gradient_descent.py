@@ -45,13 +45,13 @@ class GradientDescent(Model):
         step_size = self._find_step_size(param, x, y, param_delta)
         param = param - step_size * param_delta
         errors = self._errors(param, x, y)
-        cost = self._cost(errors)
+        cost = self._cost(errors, param)
         logger.debug(f"Cost {cost:0.3f}, step size {step_size}")
         return param, cost
 
     def _calculate_update_direction(self, param, x, y) -> np.ndarray:
-        f = lambda p: self._cost(self._errors(p, x, y))
-        return gradient(param, f)
+        f_cost = lambda p: self._cost(self._errors(p, x, y), p)  # cost, given just param as argument
+        return gradient(param, f_cost)
 
     def _find_step_size(self, param, x, y, delta):
         if self.step_size_max_iter == 0:
@@ -63,4 +63,4 @@ class GradientDescent(Model):
     def _calculate_step_size_cost(self, step_size, param, delta, x, y):
         param_candidate = param - step_size * delta
         errors = self._errors(param_candidate, x, y)
-        return self._cost(errors)
+        return self._cost(errors, param_candidate)

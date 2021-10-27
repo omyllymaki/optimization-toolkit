@@ -43,7 +43,7 @@ class SimulatedAnnealing(Model):
         temperature = self._schedule(iter_round)
         param_candidate = self.fupdate(param.copy(), iter_round)
         errors = self._errors(param_candidate, x, y)
-        param_candidate_cost = self.fcost(errors)
+        param_candidate_cost = self.fcost(errors, param_candidate)
         delta_cost = param_candidate_cost - cost
         prob = self._probability(delta_cost, temperature)
         logger.info(f"temp: {temperature} | delta cost {delta_cost} | prob {prob}")

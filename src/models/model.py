@@ -15,7 +15,7 @@ class Model(ABC):
         """
         @param feval:  Function for evaluation: y_estimate = feval(x, param).
         @param ferr:  Function to calculate errors: errors = ferr(y_estimate, y).
-        @param fcost: Function to calculate cost: cost = fcost(errors).
+        @param fcost: Function to calculate cost: cost = fcost(errors, param).
         """
         self.feval = feval
         self.ferr = ferr
@@ -45,5 +45,5 @@ class Model(ABC):
         y_eval = self.feval(x, param)
         return self.ferr(y_eval, y)
 
-    def _cost(self, errors) -> float:
-        return self.fcost(errors)
+    def _cost(self, errors, param) -> float:
+        return self.fcost(errors, param)

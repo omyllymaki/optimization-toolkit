@@ -41,7 +41,7 @@ class Optimizer:
         param = init_guess.copy()
         final_param = init_guess.copy()
         errors = self.model._errors(param, x, y)
-        cost = self.model._cost(errors)
+        cost = self.model._cost(errors, param)
         min_cost = cost
         costs = [cost]
         params = [param]

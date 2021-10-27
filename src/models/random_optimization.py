@@ -32,7 +32,7 @@ class RandomOptimization(Model):
         scale_factors = self.fscaling(iter_round)
         param_candidate = param + scale_factors * np.random.randn(param.shape[0])
         errors = self._errors(param_candidate, x, y)
-        candidate_cost = self._cost(errors)
+        candidate_cost = self._cost(errors, param_candidate)
         if candidate_cost < cost:
             param_out = param_candidate
             cost_out = candidate_cost
