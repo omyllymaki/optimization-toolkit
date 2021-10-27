@@ -25,7 +25,7 @@ def trimmed_cost(errors, param):
     squared_errors = errors ** 2
     ub = np.percentile(squared_errors, 70)
     i = squared_errors < ub
-    return mse(errors[i])
+    return mse(errors[i], param)
 
 
 def main():
