@@ -16,11 +16,11 @@ PARAMETERS = [0.1, -1, 5]
 np.random.seed(42)
 
 
-def feval(x, coeff):
+def f_eval(x, coeff):
     return coeff[0] * x ** 2 + coeff[1] * x + coeff[2]
 
 
-def fstep(iter_round, max_iter, max_step):
+def f_step(iter_round, max_iter, max_step):
     r = (iter_round / max_iter) * np.pi
     step_size_ub = np.sin(r) * max_step
     step_size_lb = 0
@@ -28,7 +28,7 @@ def fstep(iter_round, max_iter, max_step):
 
 
 # Add constrain to solution by giving penalty for neg param values
-def fcost(errors, param, neg_penalty=1e8):
+def f_cost(errors, param, neg_penalty=1e8):
     neg_param = param[param < 0]
     mse = np.mean(errors ** 2)
     penalty = neg_penalty * np.sum(neg_param ** 2)
@@ -38,19 +38,19 @@ def fcost(errors, param, neg_penalty=1e8):
 def main():
     x = np.arange(1, 100)
 
-    y = feval(x, PARAMETERS)
+    y = f_eval(x, PARAMETERS)
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = - np.random.rand(3)
     max_iter = 5000
     criteria = TerminationCriteria(max_iter=max_iter, cost_diff_threshold=-np.inf, max_iter_without_improvement=1000)
     optimizer = get_optimizer(method=Method.GD,
-                              feval=feval,
-                              fcost=partial(fcost, neg_penalty=1e8),
+                              f_eval=f_eval,
+                              f_cost=partial(f_cost, neg_penalty=1e8),
                               termination_criteria=criteria,
-                              fstep=partial(fstep, max_iter=max_iter, max_step=1e-9))
+                              f_step=partial(f_step, max_iter=max_iter, max_step=1e-9))
     param, costs, params = optimizer.fit(x, y_noisy, init_guess)
-    y_estimate = feval(x, param)
+    y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="Original, noiseless signal", linewidth=1.5)

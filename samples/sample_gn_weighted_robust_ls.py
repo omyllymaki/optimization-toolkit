@@ -20,7 +20,7 @@ PARAMETERS = [0.01, -2, 5]
 
 # Minimize the Lp norm
 # e.g. p=1 is L1 norm (least absolute deviation)
-def fweights(errors, eps, p):
+def f_weights(errors, eps, p):
     abs_errors = abs(errors)
     abs_errors[abs_errors < eps] = eps
     weights = abs_errors ** (p - 2)
@@ -28,14 +28,14 @@ def fweights(errors, eps, p):
     return weights_normalized
 
 
-def feval(x, coeff):
+def f_eval(x, coeff):
     return coeff[0] * x ** 2 + coeff[1] * x + coeff[2]
 
 
 def main():
     x = np.arange(1, 100)
 
-    y = feval(x, PARAMETERS)
+    y = f_eval(x, PARAMETERS)
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     outlier_indices = np.random.choice(len(x), N_OUTLIERS, replace=False)
@@ -47,20 +47,20 @@ def main():
     criteria = TerminationCriteria(max_iter=50, cost_diff_threshold=-np.inf)
 
     optimizer_robust = get_optimizer(method=Method.GN,
-                                     feval=feval,
-                                     fweights=partial(fweights, p=1.0, eps=1e-6),
+                                     f_eval=f_eval,
+                                     f_weights=partial(f_weights, p=1.0, eps=1e-6),
                                      termination_criteria=criteria,
                                      step_size_max_iter=0)
     param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
-    y_estimate_robust = feval(x, param_robust)
+    y_estimate_robust = f_eval(x, param_robust)
 
     optimizer = get_optimizer(method=Method.GN,
-                              feval=feval,
-                              fweights=None,
+                              f_eval=f_eval,
+                              f_weights=None,
                               termination_criteria=criteria,
                               step_size_max_iter=0)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
-    y_estimate = feval(x, param)
+    y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="True", linewidth=2.0)

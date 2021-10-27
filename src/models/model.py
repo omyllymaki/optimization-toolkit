@@ -11,15 +11,15 @@ class Model(ABC):
     Inheritors need to implement update function that updates parameters that needs to be solved.
     """
 
-    def __init__(self, feval: Callable, ferr: Callable, fcost: Callable):
+    def __init__(self, f_eval: Callable, f_err: Callable, f_cost: Callable):
         """
-        @param feval:  Function for evaluation: y_estimate = feval(x, param).
-        @param ferr:  Function to calculate errors: errors = ferr(y_estimate, y).
-        @param fcost: Function to calculate cost: cost = fcost(errors, param).
+        @param f_eval:  Function for evaluation: y_estimate = f_eval(x, param).
+        @param f_err:  Function to calculate errors: errors = f_err(y_estimate, y).
+        @param f_cost: Function to calculate cost: cost = f_cost(errors, param).
         """
-        self.feval = feval
-        self.ferr = ferr
-        self.fcost = fcost
+        self.f_eval = f_eval
+        self.f_err = f_err
+        self.f_cost = f_cost
 
     @abstractmethod
     def update(self,
@@ -42,8 +42,8 @@ class Model(ABC):
         raise NotImplementedError
 
     def _errors(self, param, x, y) -> np.ndarray:
-        y_eval = self.feval(x, param)
-        return self.ferr(y_eval, y)
+        y_eval = self.f_eval(x, param)
+        return self.f_err(y_eval, y)
 
     def _cost(self, errors, param) -> float:
-        return self.fcost(errors, param)
+        return self.f_cost(errors, param)

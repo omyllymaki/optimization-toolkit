@@ -17,7 +17,7 @@ N_OUTLIERS = 20
 PARAMETERS = [-2, 5]
 
 
-def feval(x, coeff):
+def f_eval(x, coeff):
     return coeff[0] * x + coeff[1]
 
 
@@ -31,7 +31,7 @@ def trimmed_cost(errors, param):
 def main():
     x = np.arange(1, 100)
 
-    y = feval(x, PARAMETERS)
+    y = f_eval(x, PARAMETERS)
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     indices = np.random.choice(len(x), N_OUTLIERS, replace=False)
@@ -40,24 +40,24 @@ def main():
     init_guess = np.zeros(2)
     criteria = TerminationCriteria(max_iter=200)
     step_size = 1e-5
-    fstep = lambda _: (0, step_size)
+    f_step = lambda _: (0, step_size)
     optimizer_robust = get_optimizer(method=Method.GD,
-                                     feval=feval,
-                                     fcost=trimmed_cost,
+                                     f_eval=f_eval,
+                                     f_cost=trimmed_cost,
                                      termination_criteria=criteria,
-                                     fstep=fstep,
+                                     f_step=f_step,
                                      step_size_max_iter=10)
     param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
-    y_estimate_robust = feval(x, param_robust)
+    y_estimate_robust = f_eval(x, param_robust)
 
     optimizer = get_optimizer(method=Method.GD,
-                              feval=feval,
-                              fcost=mse,
+                              f_eval=f_eval,
+                              f_cost=mse,
                               termination_criteria=criteria,
-                              fstep=fstep,
+                              f_step=f_step,
                               step_size_max_iter=10)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
-    y_estimate = feval(x, param)
+    y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="Original, noiseless signal", linewidth=1.5)

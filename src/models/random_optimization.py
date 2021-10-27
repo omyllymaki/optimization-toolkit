@@ -15,21 +15,21 @@ class RandomOptimization(Model):
     """
 
     def __init__(self,
-                 feval: Callable,
-                 fscaling: Callable,
-                 ferr: Callable = diff,
-                 fcost: Callable = rmse):
+                 f_eval: Callable,
+                 f_scaling: Callable,
+                 f_err: Callable = diff,
+                 f_cost: Callable = rmse):
         """
-        @param feval: See Model.
-        @param fscaling: Function to scaling of parameter update: scale_factors = fscaling(iter_round)
-        @param ferr: See Model.
-        @param fcost: see Model.
+        @param f_eval: See Model.
+        @param f_scaling: Function to scaling of parameter update: scale_factors = f_scaling(iter_round)
+        @param f_err: See Model.
+        @param f_cost: see Model.
         """
-        super().__init__(feval, ferr, fcost)
-        self.fscaling = fscaling
+        super().__init__(f_eval, f_err, f_cost)
+        self.f_scaling = f_scaling
 
     def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
-        scale_factors = self.fscaling(iter_round)
+        scale_factors = self.f_scaling(iter_round)
         param_candidate = param + scale_factors * np.random.randn(param.shape[0])
         errors = self._errors(param_candidate, x, y)
         candidate_cost = self._cost(errors, param_candidate)

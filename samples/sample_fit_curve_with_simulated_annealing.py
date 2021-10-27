@@ -12,11 +12,11 @@ NOISE = 5
 PARAMETERS = [0.1, -1, 5]
 
 
-def feval(x, coeff):
+def f_eval(x, coeff):
     return coeff[0] * x ** 2 + coeff[1] * x + coeff[2]
 
 
-def fupdate(param, k):
+def f_update(param, k):
     scaling_factors = 0.99 ** k * np.array([0.1, 1, 1])
     return param + scaling_factors * np.random.randn(param.shape[0])
 
@@ -24,14 +24,14 @@ def fupdate(param, k):
 def main():
     x = np.arange(1, 100)
 
-    y = feval(x, PARAMETERS)
+    y = f_eval(x, PARAMETERS)
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf, max_iter_without_improvement=200)
-    optimizer = get_optimizer(method=Method.SA, feval=feval, fupdate=fupdate, termination_criteria=criteria)
+    optimizer = get_optimizer(method=Method.SA, f_eval=f_eval, f_update=f_update, termination_criteria=criteria)
     param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
-    y_estimate = feval(x, param)
+    y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="Original, noiseless signal", linewidth=1.5)

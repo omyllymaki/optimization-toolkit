@@ -36,12 +36,12 @@ def transform(transform_matrix: np.ndarray, points: np.ndarray) -> np.ndarray:
     return transformed[:, 0:3]
 
 
-def feval(xyz, coeff):
+def f_eval(xyz, coeff):
     t = coeff_to_transform_matrix(coeff)
     return transform(t, xyz)
 
 
-def ferr(source, target):
+def f_err(source, target):
     diff = source - target
     return np.linalg.norm(diff, axis=1)
 
@@ -50,15 +50,15 @@ def main():
     for k in range(16):
         target = np.random.randn(50, 3)
         param_true = np.random.randn(6)
-        source = feval(target, param_true) + NOISE * np.random.randn(50, 3)
+        source = f_eval(target, param_true) + NOISE * np.random.randn(50, 3)
 
         init_guess = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        fstep = lambda _: (0, 0.1)
+        f_step = lambda _: (0, 0.1)
         optimizer = get_optimizer(method=Method.GD,
                                   termination_criteria=TerminationCriteria(max_iter=300),
-                                  feval=feval,
-                                  ferr=ferr,
-                                  fstep=fstep)
+                                  f_eval=f_eval,
+                                  f_err=f_err,
+                                  f_step=f_step)
         t1 = time.time()
         param, costs, _ = optimizer.fit(source, target, init_guess)
         t2 = time.time()
@@ -66,7 +66,7 @@ def main():
         t = coeff_to_transform_matrix(param)
         source_transformed = transform(t, source)
 
-        residual = ferr(source_transformed, target)
+        residual = f_err(source_transformed, target)
         rmse = np.sqrt(np.sum(residual ** 2))
 
         plt.figure(1)

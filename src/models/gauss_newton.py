@@ -20,28 +20,28 @@ class GaussNewton(Model):
 
     Based on parameter choices, this model can be used as classical GN (step_size = 1) or as damped version (step size
     between 0 and 1). This model can also be used for iteratively re-weighted least squares where weights are updated
-    every iteration, using specified function fweights. This enables e.g. robust fitting.
+    every iteration, using specified function f_weights. This enables e.g. robust fitting.
     """
 
     def __init__(self,
-                 feval: Callable,
-                 ferr: Callable = diff,
-                 fcost: Callable = mse,
-                 fweights: Callable = None,
+                 f_eval: Callable,
+                 f_err: Callable = diff,
+                 f_cost: Callable = mse,
+                 f_weights: Callable = None,
                  step_size_max_iter: int = 10,
                  step_size_lb: float = 0.0,
                  step_size_ub: float = 1.0):
         """
-        @param feval: See Model.
-        @param ferr: See Model.
-        @param fcost: See Model.
-        @param fweights: Function to calculate weights for LS fit: weights = fweights(errors)
+        @param f_eval: See Model.
+        @param f_err: See Model.
+        @param f_cost: See Model.
+        @param f_weights: Function to calculate weights for LS fit: weights = f_weights(errors)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
         @param step_size_ub: Upper bound for step size.
         """
-        super().__init__(feval, ferr, fcost)
-        self.fweights = fweights
+        super().__init__(f_eval, f_err, f_cost)
+        self.f_weights = f_weights
         self.step_size_max_iter = step_size_max_iter
         self.step_size_lb = step_size_lb
         self.step_size_ub = step_size_ub
@@ -58,8 +58,8 @@ class GaussNewton(Model):
         cost = self._cost(self.weights * errors, param)
         logger.debug(f"Cost {cost:0.3f}, step size {step_size:0.3f}")
 
-        if self.fweights is not None:
-            self.weights = self.fweights(errors)
+        if self.f_weights is not None:
+            self.weights = self.f_weights(errors)
 
         return param, cost
 

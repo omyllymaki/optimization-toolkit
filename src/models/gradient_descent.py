@@ -20,26 +20,26 @@ class GradientDescent(Model):
     """
 
     def __init__(self,
-                 fstep,
-                 feval,
-                 ferr=diff,
-                 fcost=mse,
+                 f_step,
+                 f_eval,
+                 f_err=diff,
+                 f_cost=mse,
                  step_size_max_iter=5):
         """
-        @param fstep: Function to calculate step size bounds for every iteration: lb, ub = fstep(iter_round)
-        @param feval: See Model
-        @param ferr: See Model.
-        @param fcost: See Model.
+        @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)
+        @param f_eval: See Model
+        @param f_err: See Model.
+        @param f_cost: See Model.
         @param step_size_max_iter: Number of iterations for optimal step size search.
         """
-        super().__init__(feval, ferr, fcost)
-        self.fstep = fstep
+        super().__init__(f_eval, f_err, f_cost)
+        self.f_step = f_step
         self.step_size_max_iter = step_size_max_iter
         self.step_size_lb = None
         self.step_size_ub = None
 
     def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
-        self.step_size_lb, self.step_size_ub = self.fstep(iter_round)
+        self.step_size_lb, self.step_size_ub = self.f_step(iter_round)
         logger.debug(f"Step size range: [{self.step_size_lb}, {self.step_size_ub}]")
         param_delta = self._calculate_update_direction(param, x, y)
         step_size = self._find_step_size(param, x, y, param_delta)

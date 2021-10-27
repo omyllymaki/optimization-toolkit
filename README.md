@@ -21,11 +21,11 @@ pip3 install -r requirements.txt
 
 ## What does this do?
 
-Given independent variables x, dependent variables y, and functions (feval, ferr, fcost), 
+Given independent variables x, dependent variables y, and functions (f_eval, f_err, f_cost), 
 
-- y_estimate = feval(x, parameters)
-- errors = ferr(y_estimate, y)
-- cost = fcost(errors, parameters)
+- y_estimate = f_eval(x, parameters)
+- errors = f_err(y_estimate, y)
+- cost = f_cost(errors, parameters)
 
 Solve optimal parameters that will minimize the cost, using selected optimization method.
 
