@@ -50,14 +50,14 @@ def main():
                                    f_weights=partial(f_weights, p=1.0, eps=1e-6),
                                    termination=criteria,
                                    step_size_max_iter=0)
-    param_robust, costs_robust, _ = optimizer_robust.fit(x, y_noisy, init_guess)
+    param_robust, costs_robust, _ = optimizer_robust.run(x, y_noisy, init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
     optimizer = GaussNewton(f_eval=f_eval,
                             f_weights=None,
                             termination=criteria,
                             step_size_max_iter=0)
-    param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

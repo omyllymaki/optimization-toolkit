@@ -23,7 +23,7 @@ def main():
 
     init_guess = 1000000 * np.random.random(len(PARAMETERS))
     optimizer = GaussNewton(f_eval=f_eval)
-    param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

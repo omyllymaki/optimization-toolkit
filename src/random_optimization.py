@@ -9,7 +9,7 @@ from src.utils import diff, mse
 
 class RandomOptimization(Optimizer):
     """
-    Random optimization model.
+    Random optimization optimizer.
 
     Create new parameter values candidate by adding a normally distributed random vector to the current parameter
     values. Update the current parameter values if cost of candidate is smaller than the current cost.

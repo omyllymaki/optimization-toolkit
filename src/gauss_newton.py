@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 
 class GaussNewton(Optimizer):
     """
-    Gauss-Newton model.
+    Gauss-Newton optimizer.
 
     Minimize sum(residual^2) by optimizing parameters using Gauss-Newton (GN) method.
 
-    Based on parameter choices, this model can be used as classical GN (step_size = 1) or as damped version (step size
-    between 0 and 1). This model can also be used for iteratively re-weighted least squares where weights are updated
+    Based on parameter choices, this method can be used as classical GN (step_size = 1) or as damped version (step size
+    between 0 and 1). This method can also be used for iteratively re-weighted least squares where weights are updated
     every iteration, using specified function f_weights. This enables e.g. robust fitting.
     """
 

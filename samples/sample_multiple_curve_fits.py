@@ -54,7 +54,7 @@ for f, dim in fset:
         optimizer = GaussNewton(f_eval=f, step_size_max_iter=20)
         for i in range(50):
             init_guess = np.random.rand(dim)
-            param, costs, _ = optimizer.fit(x, y, init_guess)
+            param, costs, _ = optimizer.run(x, y, init_guess)
             y_estimate = f(x, param)
             residual = y_estimate - y
             rmse = np.sqrt(np.sum(residual ** 2))

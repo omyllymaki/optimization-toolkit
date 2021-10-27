@@ -32,12 +32,12 @@ class Optimizer(ABC):
         self.f_cost = f_cost
         self.termination_criteria = termination
 
-    def fit(self,
+    def run(self,
             x: np.ndarray,
             y: np.ndarray,
             init_guess: np.ndarray) -> Tuple[np.ndarray, List[float], List[np.ndarray]]:
         """
-        Fit model
+        Run optimization.
 
         @param x: Independent variables.
         @param y: Dependent variables.

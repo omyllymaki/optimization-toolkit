@@ -29,7 +29,7 @@ def main():
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf)
     optimizer = RandomOptimization(f_eval=f_eval, f_scaling=f_scaling, termination=criteria)
-    param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

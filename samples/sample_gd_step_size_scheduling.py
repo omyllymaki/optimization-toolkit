@@ -38,7 +38,7 @@ def main():
     optimizer = GradientDescent(f_eval=f_eval,
                                 termination=criteria,
                                 f_step=partial(f_step, max_iter=max_iter))
-    param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

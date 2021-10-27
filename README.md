@@ -31,14 +31,18 @@ Solve optimal parameters that will minimize the cost, using selected optimizatio
 
 ## Usage example
 
+Minimal example:
 ```
-# Specify function you want to fit
 def f_eval(x, param):
-    ...
+    return param[0] * x + param[1]
 
-optimizer = GaussNewton(f_eval=f_eval)
-param, costs, _ = optimizer.fit(x, y, init_guess)
-y_estimate = f_eval(x, param)
+
+x = np.arange(1, 100)
+param_true = np.array([1.0, 2.5])
+y = f_eval(x, param_true)
+param, costs, _ = GaussNewton(f_eval=f_eval).run(x, y, np.random.randn(2))
+print(f"Param: {param}")
+print(f"Costs: {costs}")
 ```
 
 Samples folder contains multiple samples. Run all samples by typing:

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class GradientDescent(Optimizer):
     """
-    Gradient descent model.
+    Gradient descent optimizer.
 
     Minimize given cost function by optimizing parameters using Gradient descent method. Change step size adaptively
     for every iteration according to given input parameters.

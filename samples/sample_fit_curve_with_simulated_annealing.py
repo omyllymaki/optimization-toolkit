@@ -30,7 +30,7 @@ def main():
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf, max_iter_without_improvement=200)
     optimizer = SimulatedAnnealing(f_eval=f_eval, f_update=f_update, termination=criteria)
-    param, costs, _ = optimizer.fit(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

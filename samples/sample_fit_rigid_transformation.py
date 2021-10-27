@@ -59,7 +59,7 @@ def main():
                                     f_err=f_err,
                                     f_step=f_step)
         t1 = time.time()
-        param, costs, _ = optimizer.fit(source, target, init_guess)
+        param, costs, _ = optimizer.run(source, target, init_guess)
         t2 = time.time()
         duration_ms = 1000 * (t2 - t1)
         t = coeff_to_transform_matrix(param)

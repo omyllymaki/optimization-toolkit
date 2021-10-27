@@ -31,7 +31,7 @@ def acceptance_probability(delta_cost: float, temperature: float) -> float:
 
 class SimulatedAnnealing(Optimizer):
     """
-    Simulated annealing model.
+    Simulated annealing optimizer.
 
     Generate new parameter candidate. Replace the current parameters with the candidate with probability that depends on
     cost difference and temperature.

@@ -47,7 +47,7 @@ def main():
                                 f_cost=partial(f_cost, neg_penalty=1e8),
                                 termination=criteria,
                                 f_step=partial(f_step, max_iter=max_iter, max_step=1e-9))
-    param, costs, params = optimizer.fit(x, y_noisy, init_guess)
+    param, costs, params = optimizer.run(x, y_noisy, init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)
