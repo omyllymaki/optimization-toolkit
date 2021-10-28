@@ -29,9 +29,10 @@ Given independent variables x, dependent variables y, termination criteria, and 
 
 Solve optimal parameters that will minimize the cost, using selected optimization method.
 
-## Usage example
+## Usage
 
-Minimal example:
+### Minimal example
+
 ```
 def f_eval(x, param):
     return param[0] * x + param[1]
@@ -45,8 +46,18 @@ print(f"Param: {param}")
 print(f"Costs: {costs}")
 ```
 
+### Samples
+
 Samples folder contains multiple samples. Run all samples by typing:
 
 ```
 ./run_samples.sh
 ```
+
+### Example visualization
+
+Sample: samples/sample_cost_surface_visualization.py:
+
+<p align="center">
+<img src="samples/screenshots/optimization_example.jpg" width="800px" />
+</p>
