@@ -35,7 +35,7 @@ class Optimizer(ABC):
     def run(self,
             x: np.ndarray,
             y: np.ndarray,
-            init_guess: np.ndarray) -> Tuple[np.ndarray, List[float], List[np.ndarray]]:
+            init_guess: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Run optimization.
 
@@ -52,13 +52,13 @@ class Optimizer(ABC):
         cost = self._cost(errors, param)
         min_cost = cost
         costs = [cost]
-        params = [param]
+        params = param.copy()
         iter_round = 0
         while True:
 
             param, cost = self.update(param, x, y, iter_round, cost)
             costs.append(cost)
-            params.append(param)
+            params = np.vstack((params, param))
             logger.info(f"Round {iter_round}: cost {cost:0.5f}")
             iter_round += 1
 
@@ -69,7 +69,7 @@ class Optimizer(ABC):
             if check_termination(np.array(costs), self.termination_criteria):
                 break
 
-        return final_param, costs, params
+        return final_param, np.array(costs), params
 
     @abstractmethod
     def update(self,
