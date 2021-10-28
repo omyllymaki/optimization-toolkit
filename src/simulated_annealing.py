@@ -6,7 +6,7 @@ import numpy as np
 
 from src.optimizer import Optimizer
 from src.termination import TerminationCriteria as TC
-from src.utils import diff, rmse
+from src.utils import diff, rmse, mse
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +25,9 @@ def acceptance_probability(delta_cost: float, temperature: float) -> float:
     """
     if delta_cost < 0:
         return 1
-    else:
-        return np.exp(-delta_cost / temperature)
+    if temperature <= 0:
+        return 0
+    return np.exp(-delta_cost / temperature)
 
 
 class SimulatedAnnealing(Optimizer):
@@ -41,7 +42,7 @@ class SimulatedAnnealing(Optimizer):
                  f_eval: Callable,
                  f_update: Callable,
                  f_err: Callable = diff,
-                 f_cost: Callable = rmse,
+                 f_cost: Callable = mse,
                  f_temp: Callable = temp_decay,
                  f_prob: Callable = acceptance_probability,
                  termination=TC(max_iter=10000,
