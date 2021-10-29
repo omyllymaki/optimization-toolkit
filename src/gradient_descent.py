@@ -21,8 +21,8 @@ class GradientDescent(Optimizer):
     """
 
     def __init__(self,
-                 f_step,
                  f_cost,
+                 f_step=lambda _: (0, 1e-3),
                  step_size_max_iter=5,
                  termination=TC(max_iter=10000,
                                 max_iter_without_improvement=1000,
@@ -30,8 +30,8 @@ class GradientDescent(Optimizer):
                                 cost_diff_threshold=-np.inf)
                  ):
         """
-        @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)
         @param f_cost: See Optimizer.
+        @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param termination: See Optimizer.
         """
