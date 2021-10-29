@@ -1,6 +1,6 @@
 import logging
 from abc import abstractmethod, ABC
-from typing import Tuple, Callable, List
+from typing import Tuple, Callable
 
 import numpy as np
 
@@ -17,30 +17,20 @@ class Optimizer(ABC):
     """
 
     def __init__(self,
-                 f_eval: Callable,
-                 f_err: Callable,
                  f_cost: Callable,
                  termination: TerminationCriteria):
         """
-        @param f_eval: Function for evaluation: y_estimate = f_eval(x, param).
-        @param f_err: Function to calculate errors: errors = f_err(y_estimate, y).
-        @param f_cost: Function to calculate cost: cost = f_cost(errors, param).
+        @param f_cost: Function to calculate cost: cost = f_cost(param).
         @param termination: Criteria for termination. Check all conditions and terminate if any of them is true.
         """
-        self.f_eval = f_eval
-        self.f_err = f_err
         self.f_cost = f_cost
         self.termination_criteria = termination
 
     def run(self,
-            x: np.ndarray,
-            y: np.ndarray,
             init_guess: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Run optimization.
 
-        @param x: Independent variables.
-        @param y: Dependent variables.
         @param init_guess: Initial guess for parameters.
 
         @return: Tuple containing
@@ -48,15 +38,14 @@ class Optimizer(ABC):
         """
         param = init_guess.copy()
         final_param = init_guess.copy()
-        errors = self._errors(param, x, y)
-        cost = self._cost(errors, param)
+        cost = self.f_cost(param)
         min_cost = cost
         costs = [cost]
         params = param.copy()
         iter_round = 0
         while True:
 
-            param, cost = self.update(param, x, y, iter_round, cost)
+            param, cost = self.update(param, iter_round, cost)
             costs.append(cost)
             params = np.vstack((params, param))
             logger.info(f"Round {iter_round}: cost {cost:0.5f}")
@@ -74,26 +63,15 @@ class Optimizer(ABC):
     @abstractmethod
     def update(self,
                param: np.ndarray,
-               x: np.ndarray,
-               y: np.ndarray,
                iter_round: int,
                cost: float) -> Tuple[np.ndarray, float]:
         """
         Update parameter that needs to be solved. Inheritors need to implement this.
 
         @param param: Current parameter values.
-        @param x: Independent variables.
-        @param y: Dependent variables.
         @param iter_round:  Current iteration round.
         @param cost: Current cost.
 
         @return Tuple containing updated parameters and new cost for updated parameters.
         """
         raise NotImplementedError
-
-    def _errors(self, param, x, y) -> np.ndarray:
-        y_eval = self.f_eval(x, param)
-        return self.f_err(y_eval, y)
-
-    def _cost(self, errors, param) -> float:
-        return self.f_cost(errors, param)

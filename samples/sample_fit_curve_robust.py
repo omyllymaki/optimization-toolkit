@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -21,11 +22,13 @@ def f_eval(x, coeff):
     return coeff[0] * x + coeff[1]
 
 
-def trimmed_cost(errors, param):
+def trimmed_cost(param, x, y, threshold):
+    y_eval = f_eval(x, param)
+    errors = y_eval - y
     squared_errors = errors ** 2
-    ub = np.percentile(squared_errors, 70)
+    ub = np.percentile(squared_errors, threshold)
     i = squared_errors < ub
-    return mse(errors[i], param)
+    return mse(errors[i])
 
 
 def main():
@@ -41,20 +44,18 @@ def main():
     criteria = TerminationCriteria(max_iter=200)
     step_size = 1e-5
     f_step = lambda _: (0, step_size)
-    optimizer_robust = GradientDescent(f_eval=f_eval,
-                                       f_cost=trimmed_cost,
+    optimizer_robust = GradientDescent(f_cost=partial(trimmed_cost, x=x, y=y_noisy, threshold=70),
                                        termination=criteria,
                                        f_step=f_step,
                                        step_size_max_iter=10)
-    param_robust, costs_robust, _ = optimizer_robust.run(x, y_noisy, init_guess)
+    param_robust, costs_robust, _ = optimizer_robust.run(init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
-    optimizer = GradientDescent(f_eval=f_eval,
-                                f_cost=mse,
+    optimizer = GradientDescent(f_cost=partial(trimmed_cost, x=x, y=y_noisy, threshold=100),
                                 termination=criteria,
                                 f_step=f_step,
                                 step_size_max_iter=10)
-    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

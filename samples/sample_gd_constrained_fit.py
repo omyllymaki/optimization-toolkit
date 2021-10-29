@@ -27,7 +27,9 @@ def f_step(iter_round, max_iter, max_step):
 
 
 # Add constrain to solution by giving penalty for neg param values
-def f_cost(errors, param, neg_penalty=1e8):
+def f_cost(param, x, y, neg_penalty=1e8):
+    y_eval = f_eval(x, param)
+    errors = y_eval - y
     neg_param = param[param < 0]
     mse = np.mean(errors ** 2)
     penalty = neg_penalty * np.sum(neg_param ** 2)
@@ -43,11 +45,12 @@ def main():
     init_guess = - np.random.rand(3)
     max_iter = 5000
     criteria = TerminationCriteria(max_iter=max_iter, cost_diff_threshold=-np.inf, max_iter_without_improvement=1000)
-    optimizer = GradientDescent(f_eval=f_eval,
-                                f_cost=partial(f_cost, neg_penalty=1e8),
-                                termination=criteria,
-                                f_step=partial(f_step, max_iter=max_iter, max_step=1e-9))
-    param, costs, params = optimizer.run(x, y_noisy, init_guess)
+    optimizer = GradientDescent(
+        f_cost=partial(f_cost, x=x, y=y_noisy, neg_penalty=1e8),
+        termination=criteria,
+        f_step=partial(f_step, max_iter=max_iter, max_step=1e-9)
+    )
+    param, costs, params = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)
