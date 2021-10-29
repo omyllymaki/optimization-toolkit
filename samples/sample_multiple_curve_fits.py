@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -34,6 +35,11 @@ def f5(x, coeff):
     return (0.1 * coeff[0] * x + coeff[3] * np.cos(0.5 * coeff[2] * x)) / (coeff[1] + x + np.exp(1e-5 * coeff[4]))
 
 
+def f_err(param, x, y, f):
+    y_estimate = f(x, param)
+    return y_estimate - y
+
+
 fset = (
     (f1, 2),
     (f2, 3),
@@ -51,10 +57,11 @@ for f, dim in fset:
         print(f"Test run {k}")
         true_param = np.random.randn(dim)
         y = f(x, true_param)
-        optimizer = GaussNewton(f_eval=f, step_size_max_iter=20)
+        optimizer = GaussNewton(partial(f_err, x=x, y=y, f=f),
+                                step_size_max_iter=20)
         for i in range(50):
             init_guess = np.random.rand(dim)
-            param, costs, _ = optimizer.run(x, y, init_guess)
+            param, costs, _ = optimizer.run(init_guess)
             y_estimate = f(x, param)
             residual = y_estimate - y
             rmse = np.sqrt(np.sum(residual ** 2))
