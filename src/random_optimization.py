@@ -4,7 +4,7 @@ import numpy as np
 
 from src.optimizer import Optimizer
 from src.termination import TerminationCriteria as TC
-from src.utils import diff, mse
+from src.utils import mse
 
 
 class RandomOptimization(Optimizer):
@@ -16,9 +16,7 @@ class RandomOptimization(Optimizer):
     """
 
     def __init__(self,
-                 f_eval: Callable,
                  f_scaling: Callable,
-                 f_err: Callable = diff,
                  f_cost: Callable = mse,
                  termination=TC(max_iter=10000,
                                 max_iter_without_improvement=2000,
@@ -26,20 +24,17 @@ class RandomOptimization(Optimizer):
                                 cost_diff_threshold=-np.inf)
                  ):
         """
-        @param f_eval: See Optimizer.
         @param f_scaling: Function to scaling of parameter update: scale_factors = f_scaling(iter_round)
-        @param f_err: See Optimizer.
         @param f_cost: see Optimizer.
         @param termination: See Optimizer.
         """
-        super().__init__(f_eval, f_err, f_cost, termination)
+        super().__init__(f_cost, termination)
         self.f_scaling = f_scaling
 
-    def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
+    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
         scale_factors = self.f_scaling(iter_round)
         param_candidate = param + scale_factors * np.random.randn(param.shape[0])
-        errors = self._errors(param_candidate, x, y)
-        candidate_cost = self._cost(errors, param_candidate)
+        candidate_cost = self.f_cost(param_candidate)
         if candidate_cost < cost:
             param_out = param_candidate
             cost_out = candidate_cost
