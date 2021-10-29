@@ -35,7 +35,7 @@ class GaussNewton(Optimizer):
                                 cost_diff_threshold=1e-9)
                  ):
         """
-        @param f_err: Function to calculate errors: errors = f_err(param)
+        @param f_err: Function to calculate errors: errors = f_err(param). cost is mse(errors).
         @param f_weights: Function to calculate weights for LS fit: weights = f_weights(errors)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
