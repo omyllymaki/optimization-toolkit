@@ -23,7 +23,7 @@ pip3 install -r requirements.txt
 
 Given termination criteria and cost function f_cost 
 
-cost = f_cost(errors, parameters),
+cost = f_cost(parameters),
 
 Solve optimal parameters that will minimize the cost, using selected optimization method.
 
