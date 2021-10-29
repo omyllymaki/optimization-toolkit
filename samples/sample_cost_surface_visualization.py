@@ -1,7 +1,8 @@
 import logging
+from functools import partial
 
 import numpy as np
-from matplotlib import pyplot as plt, colors
+from matplotlib import pyplot as plt
 
 from src.gauss_newton import GaussNewton
 from src.gradient_descent import GradientDescent
@@ -18,6 +19,17 @@ def f_eval(x, param):
     return (param[0] * x - 2) ** 2 * np.sin(param[1] * x - 4)
 
 
+def f_err(param, x, y):
+    y_estimate = f_eval(x, param)
+    return y_estimate - y
+
+
+def f_cost(param, x, y):
+    y_eval = f_eval(x, param)
+    errors = y_eval - y
+    return mse(errors)
+
+
 def main():
     param_true = [0.5, 0.1]
     x = np.arange(0, 1, 0.01)
@@ -31,7 +43,7 @@ def main():
         for j, p2 in enumerate(grid):
             y_eval = f_eval(x, [p1, p2])
             errors = y_eval - y
-            cost = mse(errors, None)
+            cost = mse(errors)
 
             grid_costs.append(cost)
             cost_matrix[i, j] = cost
@@ -48,18 +60,17 @@ def main():
     f_update = lambda p, k: p + 0.995 ** k * np.random.randn(2)
     f_temp = lambda k: 0.2 * np.exp(-0.05 * k)
     optimizers = {
-        "GN": (GaussNewton(f_eval=f_eval), "saddlebrown"),
-        "GD": (GradientDescent(f_eval=f_eval, f_step=f_step), "darkorange"),
-        "RO": (RandomOptimization(f_eval=f_eval, f_scaling=f_scaling), "red"),
-        "SA": (SimulatedAnnealing(f_eval=f_eval, f_update=f_update, f_temp=f_temp), "cyan")
+        "GN": (GaussNewton(f_err=partial(f_err, x=x, y=y)), "saddlebrown"),
+        "GD": (GradientDescent(f_cost=partial(f_cost, x=x, y=y), f_step=f_step), "darkorange"),
+        "RO": (RandomOptimization(f_cost=partial(f_cost, x=x, y=y), f_scaling=f_scaling), "red"),
+        "SA": (SimulatedAnnealing(f_cost=partial(f_cost, x=x, y=y), f_update=f_update, f_temp=f_temp), "cyan")
     }
 
     init_guess = np.array([2.5, -2])
 
     for name, (optimizer, color) in optimizers.items():
         print(f"Running {name}")
-        param, costs, params = optimizer.run(x, y, init_guess.copy())
-        y_estimate = f_eval(x, param)
+        param, costs, params = optimizer.run(init_guess.copy())
         plt.subplot(1, 2, 1)
         plt.plot(params[:, 0], params[:, 1], "-", label=name, color=color)
         plt.ylabel("Param 2")

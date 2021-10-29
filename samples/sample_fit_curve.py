@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,6 +16,11 @@ def f_eval(x, coeff):
     return coeff[0] * x ** 3 + coeff[1] * x ** 2 + coeff[2] * x + coeff[3] + coeff[4] * np.sin(x)
 
 
+def f_err(param, x, y):
+    y_estimate = f_eval(x, param)
+    return y_estimate - y
+
+
 def main():
     x = np.arange(1, 100)
 
@@ -22,8 +28,8 @@ def main():
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = 1000000 * np.random.random(len(PARAMETERS))
-    optimizer = GaussNewton(f_eval=f_eval)
-    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
+    optimizer = GaussNewton(f_err=partial(f_err, x=x, y=y_noisy))
+    param, costs, _ = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

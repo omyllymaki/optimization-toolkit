@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Tuple, Callable, List
+from typing import Tuple, Callable
 
 import numpy as np
 from numpy.linalg import pinv
@@ -17,7 +17,7 @@ class GaussNewton(Optimizer):
     """
     Gauss-Newton optimizer.
 
-    Minimize sum(residual^2) by optimizing parameters using Gauss-Newton (GN) method.
+    Minimize sum(errors^2) by optimizing parameters using Gauss-Newton (GN) method.
 
     Based on parameter choices, this method can be used as classical GN (step_size = 1) or as damped version (step size
     between 0 and 1). This method can also be used for iteratively re-weighted least squares where weights are updated
@@ -25,9 +25,7 @@ class GaussNewton(Optimizer):
     """
 
     def __init__(self,
-                 f_eval: Callable,
                  f_err: Callable = diff,
-                 f_cost: Callable = mse,
                  f_weights: Callable = None,
                  step_size_max_iter: int = 10,
                  step_size_lb: float = 0.0,
@@ -37,9 +35,7 @@ class GaussNewton(Optimizer):
                                 cost_diff_threshold=1e-9)
                  ):
         """
-        @param f_eval: See Optimizer.
-        @param f_err: See Optimizer.
-        @param f_cost: See Optimizer.
+        @param f_err: Function to calculate errors: errors = f_err(param). cost is mse(errors).
         @param f_weights: Function to calculate weights for LS fit: weights = f_weights(errors)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
@@ -47,44 +43,49 @@ class GaussNewton(Optimizer):
         @param step_size_ub: Upper bound for step size.
         @param termination: See Optimizer.
         """
-        super().__init__(f_eval, f_err, f_cost, termination)
+        self.f_err = f_err
         self.f_weights = f_weights
         self.step_size_max_iter = step_size_max_iter
         self.step_size_lb = step_size_lb
         self.step_size_ub = step_size_ub
         self.weights = None
+        super().__init__(self.f_cost, termination)
 
-    def update(self, param, x, y, iter_round, cost) -> Tuple[np.ndarray, float]:
-        if iter_round == 0:
-            self.weights = np.ones(y.shape[0])
-
-        param_delta = self._calculate_update_direction(param, x, y)
-        step_size = self._find_step_size(param, x, y, param_delta)
+    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
+        param_delta = self._calculate_update_direction(param)
+        step_size = self._find_step_size(param, param_delta)
         param = param - step_size * param_delta
-        errors = self._errors(param, x, y)
-        cost = self._cost(self.weights * errors, param)
+        cost = self.f_cost(param)
         logger.debug(f"Cost {cost:0.3f}, step size {step_size:0.3f}")
 
         if self.f_weights is not None:
+            errors = self.f_err(param)
             self.weights = self.f_weights(errors)
 
         return param, cost
 
-    def _calculate_update_direction(self, param, x, y) -> np.ndarray:
-        errors = self._errors(param, x, y)
-        f = partial(self._errors, x=x, y=y)
-        jac = gradient(param, f)
-        w = np.diag(self.weights)
-        return pinv(jac.T @ w @ jac) @ jac.T @ w @ errors
+    def _calculate_update_direction(self, param) -> np.ndarray:
+        errors = self.f_err(param)
+        jac = gradient(param, self.f_err)
+        if self.weights is None:
+            return pinv(jac.T @ jac) @ jac.T @ errors
+        else:
+            w = np.diag(self.weights)
+            return pinv(jac.T @ w @ jac) @ jac.T @ w @ errors
 
-    def _find_step_size(self, param, x, y, delta):
+    def _find_step_size(self, param, delta):
         if self.step_size_max_iter == 0:
             return (self.step_size_lb + self.step_size_ub) / 2
-        f = partial(self._calculate_step_size_cost, param=param, delta=delta, x=x, y=y)
+        f = partial(self._calculate_step_size_cost, param=param, delta=delta)
         d_min, d_max = gss(f, self.step_size_lb, self.step_size_ub, max_iter=self.step_size_max_iter)
         return (d_min + d_max) / 2
 
-    def _calculate_step_size_cost(self, step_size, param, delta, x, y):
+    def _calculate_step_size_cost(self, step_size, param, delta):
         param_candidate = param - step_size * delta
-        errors = self._errors(param_candidate, x, y)
-        return self._cost(self.weights * errors, param_candidate)
+        return self.f_cost(param_candidate)
+
+    def f_cost(self, param):
+        if self.weights is None:
+            return mse(self.f_err(param))
+        else:
+            return mse(self.weights * self.f_err(param))

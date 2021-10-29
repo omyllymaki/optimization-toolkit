@@ -32,6 +32,11 @@ def f_eval(x, coeff):
     return coeff[0] * x ** 2 + coeff[1] * x + coeff[2]
 
 
+def f_err(param, x, y):
+    y_estimate = f_eval(x, param)
+    return y_estimate - y
+
+
 def main():
     x = np.arange(1, 100)
 
@@ -46,18 +51,18 @@ def main():
     init_guess = np.zeros(3)
     criteria = TerminationCriteria(max_iter=50, cost_diff_threshold=-np.inf)
 
-    optimizer_robust = GaussNewton(f_eval=f_eval,
+    optimizer_robust = GaussNewton(f_err=partial(f_err, x=x, y=y_noisy),
                                    f_weights=partial(f_weights, p=1.0, eps=1e-6),
                                    termination=criteria,
                                    step_size_max_iter=0)
-    param_robust, costs_robust, _ = optimizer_robust.run(x, y_noisy, init_guess)
+    param_robust, costs_robust, _ = optimizer_robust.run(init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
-    optimizer = GaussNewton(f_eval=f_eval,
+    optimizer = GaussNewton(f_err=partial(f_err, x=x, y=y_noisy),
                             f_weights=None,
                             termination=criteria,
                             step_size_max_iter=0)
-    param, costs, _ = optimizer.run(x, y_noisy, init_guess)
+    param, costs, _ = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)
 
     plt.subplot(1, 2, 1)

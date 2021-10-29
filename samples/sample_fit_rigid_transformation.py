@@ -1,5 +1,6 @@
 import logging
 import time
+from functools import partial
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,6 +8,7 @@ from scipy.spatial.transform import Rotation as R
 
 from src.gradient_descent import GradientDescent
 from src.termination import TerminationCriteria
+from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
@@ -46,6 +48,12 @@ def f_err(source, target):
     return np.linalg.norm(diff, axis=1)
 
 
+def f_cost(param, source, target):
+    source_transformed = f_eval(source, param)
+    errors = f_err(source_transformed, target)
+    return mse(errors)
+
+
 def main():
     for k in range(16):
         target = np.random.randn(50, 3)
@@ -55,11 +63,10 @@ def main():
         init_guess = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         f_step = lambda _: (0, 0.1)
         optimizer = GradientDescent(termination=TerminationCriteria(max_iter=300),
-                                    f_eval=f_eval,
-                                    f_err=f_err,
+                                    f_cost=partial(f_cost, source=source, target=target),
                                     f_step=f_step)
         t1 = time.time()
-        param, costs, _ = optimizer.run(source, target, init_guess)
+        param, costs, _ = optimizer.run(init_guess)
         t2 = time.time()
         duration_ms = 1000 * (t2 - t1)
         t = coeff_to_transform_matrix(param)
