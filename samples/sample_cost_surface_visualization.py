@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 
 from src.gauss_newton import GaussNewton
 from src.gradient_descent import GradientDescent
+from src.nelder_mead import NelderMead, generate_init_test_points
 from src.random_optimization import RandomOptimization
 from src.simulated_annealing import SimulatedAnnealing
 from src.utils import mse
@@ -55,18 +56,20 @@ def main():
     plt.pcolormesh(xx, yy, zz ** 0.2)
     plt.colorbar()
 
+    init_guess = np.array([2.5, -2])
+
     f_step = lambda _: (0, 2.0)
     f_scaling = lambda k: 0.995 ** k * np.ones(2)
     f_update = lambda p, k: p + 0.995 ** k * np.random.randn(2)
     f_temp = lambda k: 0.2 * np.exp(-0.05 * k)
+    init_points_nm = generate_init_test_points(init_guess, 0.1)
     optimizers = {
         "GN": (GaussNewton(f_err=partial(f_err, x=x, y=y)), "saddlebrown"),
         "GD": (GradientDescent(f_cost=partial(f_cost, x=x, y=y), f_step=f_step), "darkorange"),
         "RO": (RandomOptimization(f_cost=partial(f_cost, x=x, y=y), f_scaling=f_scaling), "red"),
-        "SA": (SimulatedAnnealing(f_cost=partial(f_cost, x=x, y=y), f_update=f_update, f_temp=f_temp), "cyan")
+        "SA": (SimulatedAnnealing(f_cost=partial(f_cost, x=x, y=y), f_update=f_update, f_temp=f_temp), "cyan"),
+        "NM": (NelderMead(f_cost=partial(f_cost, x=x, y=y), init_test_points=init_points_nm), "green")
     }
-
-    init_guess = np.array([2.5, -2])
 
     for name, (optimizer, color) in optimizers.items():
         print(f"Running {name}")
