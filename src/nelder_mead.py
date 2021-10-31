@@ -27,34 +27,29 @@ class NelderMead(Optimizer):
     """
     Nelder-Mead optimizer.
 
-    In this method we generate n_dim + 1 test points. We evaluate cost of every test point. Then the worst (highest
-    cost) test point is replaced with new test point in every iteration using following rules:
+    In this method we generate initial n_dim + 1 test points. We evaluate cost of every test point.
 
-    Generate reflected point
-    Case 1:  Reflected point is better than the second worst, but not better than the best test point
-        -> Replace worst point with reflected point
-    Case 2: Reflected point is the better than any test point
-        -> Generate expanded point
-        -> Replace worst point with expanded point or reflected point, whichever is better
-    Case 3: Reflected point is the worse than second worst test point
-        -> Generate contracted point
-        -> If contracted point is better than worst test point, replace it with contracted point
-        -> Else shrink all test point towards best test point (this should happen only in some rare situations)
+    After that, in every iteration, we generate reflection point. Direction of reflection goes through worst point and
+    centroid of other points.
 
-    reflected_point = worst_point + reflection_factor * update_direction; reflection_factor > 1
-    expanded_point = worst_point + expansion_factor * update_direction; expansion_factor > reflection_factor
-    point_contracted = worst_point + contraction_factor * update_direction; contraction_factor < 1.0
+    Based on the reflection point cost fr and current test point costs (f1, f2, ..., fn, fn+1), we select one the
+    following steps:
+    - fr < f1: expansion or reflection, whichever is better
+    - f1 <= fr = fn: reflection
+    - fn <= fr < fn+1: outside contraction or shrink
+    - fr >= fn+1: inside contraction or shrink
 
-    Update direction is vector from worst test point to centroid of other test points.
+    In expansion, reflection and contraction, the worst point is replaced with new point. In shrink step, all the
+    points are moved towards the best test point.
     """
 
     def __init__(self,
                  f_cost: Callable,
                  init_test_points: np.ndarray,
-                 reflection_factor=2.0,
-                 expansion_factor=4.0,
-                 contraction_factor=0.5,
-                 shrink_factor=0.5,
+                 reflection_factor: float = 1.0,
+                 expansion_factor: float = 2.0,
+                 contraction_factor: float = 0.5,
+                 shrink_factor: float = 0.5,
                  termination=TC(max_iter=1000,
                                 max_iter_without_improvement=200,
                                 cost_threshold=1e-6,
@@ -63,11 +58,11 @@ class NelderMead(Optimizer):
         """
 
         @param f_cost: See Optimizer.
-        @param init_test_points: Initial test points (n_param + 1 points)
-        @param reflection_factor: Step size to generate reflected point; should be > 1.
-        @param expansion_factor: Step size to generate expanded point: should be > reflection_factor.
-        @param contraction_factor: Step size to generate contracted point: should be < 1.
-        @param shrink_factor: Step size to shrink points towards best point; should be < 1.
+        @param init_test_points: Initial test points (n_param + 1 points).
+        @param reflection_factor: Step size to generate reflected point.
+        @param expansion_factor: Step size to generate expanded point (> 1).
+        @param contraction_factor: Step size to generate contracted point (< 1).
+        @param shrink_factor: Step size to shrink points towards best point (< 1).
         @param termination: See Optimizer.
         """
         super().__init__(f_cost, termination)
@@ -85,52 +80,28 @@ class NelderMead(Optimizer):
 
     def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
 
-        # Centroid of test points, except worst
+        # Centroid of test points, worst point not included
         centroid = np.mean(self.points[:-1], axis=0)
 
-        # Get direction for update
-        worst_point = self.points[-1]
-        update_direction = centroid - worst_point
-
         # Generate reflected point
-        reflected_point = worst_point + self.reflection_factor * update_direction
+        worst_point = self.points[-1]
+        reflected_point = centroid + self.reflection_factor * (centroid - worst_point)
         cost_reflected = self.f_cost(reflected_point)
 
-        # Case 1: Reflected point is better than the second worst, but not better than the best test point
-        if (cost_reflected < self.point_costs[-2]) and (cost_reflected > self.point_costs[0]):
-            self.point_costs[-1] = cost_reflected
-            self.points[-1] = reflected_point
-            logger.info("Reflection, not best so far")
+        # Limits
+        cost_best = self.point_costs[0]
+        cost_second_worst = self.point_costs[-2]
+        cost_worst = self.point_costs[-1]
 
-        # Case 2: Reflected point is better than any test point
-        # Try expansion
-        elif cost_reflected < self.point_costs[0]:
-            expanded_point = worst_point + self.expansion_factor * update_direction
-            cost_expanded = self.f_cost(expanded_point)
-            if cost_expanded < cost_reflected:
-                self.point_costs[-1] = cost_expanded
-                self.points[-1] = expanded_point
-                logger.debug("Expansion, best so far")
-            else:
-                self.point_costs[-1] = cost_reflected
-                self.points[-1] = reflected_point
-                logger.debug("Reflection, best so far")
-
-        # Case 3: Reflected point is worse than second worst test point
-        # Try contraction
-        elif cost_reflected > self.point_costs[-2]:
-            point_contracted = worst_point + self.contraction_factor * update_direction
-            cost_contracted = self.f_cost(point_contracted)
-
-            # Contracted point is better than worst point
-            if cost_contracted < self.point_costs[-1]:
-                self.point_costs[-1] = cost_contracted
-                self.points[-1] = point_contracted
-                logger.debug("Contraction")
-            # Shrink polygon: move all points towards best point
-            else:
-                self.points[1:] = self.points[0] + self.shrink_factor * (self.points[1:] - self.points[0])
-                logger.debug("Shrink")
+        # Select case based on reflection cost and test point costs
+        if cost_reflected < cost_best:
+            self._expansion(centroid, reflected_point, cost_reflected)
+        elif (cost_reflected >= cost_best) and (cost_reflected < cost_second_worst):
+            self._reflection(reflected_point, cost_reflected)
+        elif (cost_reflected >= cost_second_worst) and (cost_reflected < cost_worst):
+            self._outside_contraction(centroid, reflected_point, cost_reflected)
+        else:
+            self.inside_contraction(centroid, reflected_point, cost_worst)
 
         # Sort based on costs
         indices = np.argsort(self.point_costs)
@@ -138,3 +109,44 @@ class NelderMead(Optimizer):
         self.point_costs = self.point_costs[indices]
 
         return self.points[0], self.point_costs[0]
+
+    def _expansion(self, centroid, reflected_point, cost_reflected):
+        expanded_point = centroid + self.expansion_factor * (reflected_point - centroid)
+        cost_expanded = self.f_cost(expanded_point)
+        if cost_expanded < cost_reflected:
+            logger.debug("Expansion")
+            self.point_costs[-1] = cost_expanded
+            self.points[-1] = expanded_point
+        else:
+            logger.debug("Reflection")
+            self.point_costs[-1] = cost_reflected
+            self.points[-1] = reflected_point
+
+    def _reflection(self, reflected_point, cost_reflected):
+        logger.debug("Reflection")
+        self.point_costs[-1] = cost_reflected
+        self.points[-1] = reflected_point
+
+    def _outside_contraction(self, centroid, reflected_point, cost_reflected):
+        point_contracted = centroid + self.contraction_factor * (reflected_point - centroid)
+        cost_contracted = self.f_cost(point_contracted)
+        if cost_contracted <= cost_reflected:
+            logger.debug("Outside contraction")
+            self.point_costs[-1] = cost_contracted
+            self.points[-1] = point_contracted
+        else:
+            self._shrink()
+
+    def inside_contraction(self, centroid, reflected_point, cost_worst):
+        point_contracted = centroid - self.contraction_factor * (reflected_point - centroid)
+        cost_contracted = self.f_cost(point_contracted)
+        if cost_contracted <= cost_worst:
+            logger.debug("Inside contraction")
+            self.point_costs[-1] = cost_contracted
+            self.points[-1] = point_contracted
+        else:
+            self._shrink()
+
+    def _shrink(self):
+        logger.debug("Shrink")
+        self.points[1:] = self.points[0] + self.shrink_factor * (self.points[1:] - self.points[0])
