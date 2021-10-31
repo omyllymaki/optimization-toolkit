@@ -27,9 +27,23 @@ cost = f_cost(parameters),
 
 Solve optimal parameters that will minimize the cost, using selected optimization method.
 
+## Supported optimization methods
+
+Currently, following optimization methods are supported:
+- Gradient Descent
+- Gauss-Newton
+  * Classical GN 
+  * Damped GN
+  * Iterative reweighting
+- Nelder-Mead
+- Random Optimization
+- Simulated Annealing
+
+All the methods can be configured flexibly with callbacks.
+
 ## Usage
 
-### Minimal direct optimization problem
+### Minimal minimization problem
 
 ```
 def f_cost(param):
