@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def generate_init_test_points(param, scale):
     """
-    Helper function generate test points for Nelder-Mead optimizer.
+    Helper function to generate initial test points for Nelder-Mead optimizer.
     """
     n_dim = len(param)
     points = param.copy()
@@ -21,6 +21,17 @@ def generate_init_test_points(param, scale):
         point = param + scale * v
         points = np.vstack((points, point))
     return points
+
+
+def get_factors(n_dim):
+    """
+    Helper function to get factors for Nelder-Mead optimizer, based on the dimension of the problem.
+    """
+    reflection_factor = 1.0
+    expansion_factor = 1 + 2 / n_dim
+    contraction_factor = 0.75 - 1 / (2 * n_dim)
+    shrink_factor = 1 - 1 / n_dim
+    return reflection_factor, expansion_factor, contraction_factor, shrink_factor
 
 
 class NelderMead(Optimizer):
