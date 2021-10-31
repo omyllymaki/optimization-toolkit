@@ -51,9 +51,9 @@ class NelderMead(Optimizer):
     centroid of other points.
 
     Based on the reflection point cost fr and current test point costs (f1, f2, ..., fn, fn+1), we select one the
-    following threshold:
+    following steps:
     - fr < f1: expansion or reflection, whichever is better
-    - f1 <= fr = fn: reflection
+    - f1 <= fr < fn: reflection
     - fn <= fr < fn+1: outside contraction or shrink
     - fr >= fn+1: inside contraction or shrink
 
