@@ -110,13 +110,13 @@ class NelderMead(Optimizer):
 
         # Select case based on reflection cost and test point costs
         if cost_reflected < cost_best:
-            self._expansion(centroid, reflected_point, cost_reflected)
+            self._expansion_or_reflection(centroid, reflected_point, cost_reflected)
         elif (cost_reflected >= cost_best) and (cost_reflected < cost_second_worst):
             self._reflection(reflected_point, cost_reflected)
         elif (cost_reflected >= cost_second_worst) and (cost_reflected < cost_worst):
-            self._outside_contraction(centroid, reflected_point, cost_reflected)
+            self._outside_contraction_or_shrink(centroid, reflected_point, cost_reflected)
         else:
-            self.inside_contraction(centroid, reflected_point, cost_worst)
+            self.inside_contraction_or_shrink(centroid, reflected_point, cost_worst)
 
         # Sort based on costs
         indices = np.argsort(self.point_costs)
@@ -125,7 +125,7 @@ class NelderMead(Optimizer):
 
         return self.points[0], self.point_costs[0]
 
-    def _expansion(self, centroid, reflected_point, cost_reflected):
+    def _expansion_or_reflection(self, centroid, reflected_point, cost_reflected):
         expanded_point = centroid + self.expansion_factor * (reflected_point - centroid)
         cost_expanded = self.f_cost(expanded_point)
         if cost_expanded < cost_reflected:
@@ -142,7 +142,7 @@ class NelderMead(Optimizer):
         self.point_costs[-1] = cost_reflected
         self.points[-1] = reflected_point
 
-    def _outside_contraction(self, centroid, reflected_point, cost_reflected):
+    def _outside_contraction_or_shrink(self, centroid, reflected_point, cost_reflected):
         point_contracted = centroid + self.contraction_factor * (reflected_point - centroid)
         cost_contracted = self.f_cost(point_contracted)
         if cost_contracted <= cost_reflected:
@@ -152,7 +152,7 @@ class NelderMead(Optimizer):
         else:
             self._shrink()
 
-    def inside_contraction(self, centroid, reflected_point, cost_worst):
+    def inside_contraction_or_shrink(self, centroid, reflected_point, cost_worst):
         point_contracted = centroid - self.contraction_factor * (reflected_point - centroid)
         cost_contracted = self.f_cost(point_contracted)
         if cost_contracted <= cost_worst:
