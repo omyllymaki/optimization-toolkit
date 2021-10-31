@@ -66,10 +66,12 @@ Samples folder contains multiple samples. Run all samples by typing:
 ./run_samples.sh
 ```
 
-### Example visualization
+## Examples
 
-Sample: samples/sample_cost_surface_visualization.py:
+### Rosenbrock function
+
+Sample: samples/sample_rosenbrock_minimization.py:
 
 <p align="center">
-<img src="samples/screenshots/optimization_example.jpg" width="800px" />
+<img src="samples/screenshots/rosenbrock_function_minimization.jpg" width="800px" />
 </p>

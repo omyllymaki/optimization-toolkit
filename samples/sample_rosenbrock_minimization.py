@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from matplotlib import pyplot as plt
 
+from src.gauss_newton import GaussNewton
 from src.gradient_descent import GradientDescent
 from src.nelder_mead import generate_init_test_points, NelderMead
 from src.random_optimization import RandomOptimization
@@ -29,6 +30,15 @@ def f_step(iter_round, max_iter=10000):
     return step_size_lb, step_size_ub
 
 
+# This is needed for Gauss-newton
+# Here we define f_err so that f_cost = mse(f_err) = sum(f_err^2)
+# In practice, f_cost = e1^2 + e2^2 = (a - param[0])^2 + b*(param[1] - param[0]^2)^2
+def f_err(param, a=1, b=100):
+    e1 = a - param[0]
+    e2 = np.sqrt(b) * (param[1] - param[0] ** 2)
+    return np.array([e1, e2])
+
+
 def main():
     true_minimum = np.array([1, 1])
 
@@ -48,9 +58,10 @@ def main():
     init_points_nm = generate_init_test_points(init_guess, 1.0)
     optimizers = {
         "GD": (GradientDescent(f_cost=f_cost, f_step=f_step), "darkorange"),
+        "GN": (GaussNewton(f_err=f_err), "darkblue"),
         "RO": (RandomOptimization(f_cost=f_cost, f_scaling=f_scaling), "red"),
         "SA": (SimulatedAnnealing(f_cost=f_cost, f_update=f_update, f_temp=f_temp), "cyan"),
-        "NM": (NelderMead(f_cost=f_cost, init_test_points=init_points_nm), "brown")
+        "NM": (NelderMead(f_cost=f_cost, init_test_points=init_points_nm), "darkviolet")
     }
 
     plt.subplot(1, 2, 1)
