@@ -28,6 +28,10 @@ class GaussNewton(Optimizer):
     Based on parameter choices, this method can be used as classical GN (step_size = 1) or as damped version (step size
     between 0 and 1). This method can also be used for iteratively re-weighted least squares where weights are updated
     every iteration, using specified function f_weights. This enables e.g. robust fitting.
+
+    Note that Gauss-Newton optimizer takes f_err instead of f_cost as input. f_cost is then implicitly defined as
+
+    f_cost = MSE(f_err(param))
     """
 
     def __init__(self,
@@ -39,7 +43,7 @@ class GaussNewton(Optimizer):
                  termination_checks=TERMINATION_CHECKS
                  ):
         """
-        @param f_err: Function to calculate errors: errors = f_err(param). cost is mse(errors).
+        @param f_err: Function to calculate errors: errors = f_err(param). cost is then calculated as MSE(errors).
         @param f_weights: Function to calculate weights for LS fit: weights = f_weights(errors)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
