@@ -1,10 +1,17 @@
 import logging
+from functools import partial
 from typing import Callable, Tuple
 
 import numpy as np
 
 from src.optimizer import Optimizer
-from src.termination import TerminationCriteria as TC
+from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
+
+TERMINATION_CHECKS = (
+    partial(check_n_iter, threshold=1000),
+    partial(check_n_iter_without_improvement, threshold=200),
+    partial(check_absolute_cost, threshold=1e-6)
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +51,7 @@ class NelderMead(Optimizer):
     centroid of other points.
 
     Based on the reflection point cost fr and current test point costs (f1, f2, ..., fn, fn+1), we select one the
-    following steps:
+    following threshold:
     - fr < f1: expansion or reflection, whichever is better
     - f1 <= fr = fn: reflection
     - fn <= fr < fn+1: outside contraction or shrink
@@ -61,10 +68,7 @@ class NelderMead(Optimizer):
                  expansion_factor: float = 2.0,
                  contraction_factor: float = 0.5,
                  shrink_factor: float = 0.5,
-                 termination=TC(max_iter=1000,
-                                max_iter_without_improvement=200,
-                                cost_threshold=1e-6,
-                                cost_diff_threshold=-np.inf)
+                 termination_checks=TERMINATION_CHECKS
                  ):
         """
 
@@ -74,9 +78,9 @@ class NelderMead(Optimizer):
         @param expansion_factor: Step size to generate expanded point (> 1).
         @param contraction_factor: Step size to generate contracted point (< 1).
         @param shrink_factor: Step size to shrink points towards best point (< 1).
-        @param termination: See Optimizer.
+        @param termination_checks: See Optimizer.
         """
-        super().__init__(f_cost, termination)
+        super().__init__(f_cost, termination_checks)
         self.init_test_points = init_test_points
         self.reflection_factor = reflection_factor
         self.expansion_factor = expansion_factor

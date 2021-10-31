@@ -1,10 +1,17 @@
+from functools import partial
 from typing import Tuple, Callable
 
 import numpy as np
 
 from src.optimizer import Optimizer
-from src.termination import TerminationCriteria as TC
+from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
 from src.utils import mse
+
+TERMINATION_CHECKS = (
+    partial(check_n_iter, threshold=10000),
+    partial(check_n_iter_without_improvement, threshold=2000),
+    partial(check_absolute_cost, threshold=1e-6),
+)
 
 
 class RandomOptimization(Optimizer):
@@ -18,17 +25,14 @@ class RandomOptimization(Optimizer):
     def __init__(self,
                  f_scaling: Callable,
                  f_cost: Callable = mse,
-                 termination=TC(max_iter=10000,
-                                max_iter_without_improvement=2000,
-                                cost_threshold=1e-6,
-                                cost_diff_threshold=-np.inf)
+                 termination_checks=TERMINATION_CHECKS,
                  ):
         """
         @param f_scaling: Function to scaling of parameter update: scale_factors = f_scaling(iter_round)
         @param f_cost: see Optimizer.
-        @param termination: See Optimizer.
+        @param termination_checks: See Optimizer.
         """
-        super().__init__(f_cost, termination)
+        super().__init__(f_cost, termination_checks)
         self.f_scaling = f_scaling
 
     def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:

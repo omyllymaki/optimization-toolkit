@@ -6,10 +6,16 @@ import numpy as np
 
 from src.gss import gss
 from src.optimizer import Optimizer
-from src.termination import TerminationCriteria as TC
+from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
 from src.utils import gradient
 
 logger = logging.getLogger(__name__)
+
+TERMINATION_CHECKS = (
+    partial(check_n_iter, threshold=10000),
+    partial(check_n_iter_without_improvement, threshold=1000),
+    partial(check_absolute_cost, threshold=1e-6),
+)
 
 
 class GradientDescent(Optimizer):
@@ -24,18 +30,15 @@ class GradientDescent(Optimizer):
                  f_cost,
                  f_step=lambda _: (0, 1e-3),
                  step_size_max_iter=5,
-                 termination=TC(max_iter=10000,
-                                max_iter_without_improvement=1000,
-                                cost_threshold=1e-6,
-                                cost_diff_threshold=-np.inf)
+                 termination_checks=TERMINATION_CHECKS
                  ):
         """
         @param f_cost: See Optimizer.
         @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)
         @param step_size_max_iter: Number of iterations for optimal step size search.
-        @param termination: See Optimizer.
+        @param termination_checks: See Optimizer.
         """
-        super().__init__(f_cost, termination)
+        super().__init__(f_cost, termination_checks)
         self.f_step = f_step
         self.step_size_max_iter = step_size_max_iter
         self.step_size_lb = None

@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.gauss_newton import GaussNewton
-from src.termination import TerminationCriteria
+from src.termination import check_n_iter
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
@@ -49,19 +49,20 @@ def main():
     y_noisy[outlier_indices] = y_noisy[outlier_indices] + y_outliers
 
     init_guess = np.zeros(3)
-    criteria = TerminationCriteria(max_iter=50, cost_diff_threshold=-np.inf)
+
+    termination_checks = partial(check_n_iter, threshold=50)
 
     optimizer_robust = GaussNewton(f_err=partial(f_err, x=x, y=y_noisy),
                                    f_weights=partial(f_weights, p=1.0, eps=1e-6),
-                                   termination=criteria,
-                                   step_size_max_iter=0)
+                                   step_size_max_iter=0,
+                                   termination_checks=termination_checks)
     param_robust, costs_robust, _ = optimizer_robust.run(init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
     optimizer = GaussNewton(f_err=partial(f_err, x=x, y=y_noisy),
                             f_weights=None,
-                            termination=criteria,
-                            step_size_max_iter=0)
+                            step_size_max_iter=0,
+                            termination_checks=termination_checks)
     param, costs, _ = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)
 

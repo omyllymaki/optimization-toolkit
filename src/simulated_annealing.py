@@ -1,14 +1,21 @@
 import logging
 import random
+from functools import partial
 from typing import Tuple, Callable
 
 import numpy as np
 
 from src.optimizer import Optimizer
-from src.termination import TerminationCriteria as TC
+from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
 from src.utils import mse
 
 logger = logging.getLogger(__name__)
+
+TERMINATION_CHECKS = (
+    partial(check_n_iter, threshold=10000),
+    partial(check_n_iter_without_improvement, threshold=2000),
+    partial(check_absolute_cost, threshold=1e-6)
+)
 
 
 def temp_decay(t: int, max_temperature=1.0, decay_constant=0.005) -> float:
@@ -43,19 +50,16 @@ class SimulatedAnnealing(Optimizer):
                  f_cost: Callable = mse,
                  f_temp: Callable = temp_decay,
                  f_prob: Callable = acceptance_probability,
-                 termination=TC(max_iter=10000,
-                                max_iter_without_improvement=2000,
-                                cost_threshold=1e-6,
-                                cost_diff_threshold=-np.inf)
+                 termination_checks=TERMINATION_CHECKS
                  ):
         """
         @param f_update: Function to generate param candidate: param_candidate = f_update(param, iter_round)
         @param f_cost: See Optimizer.
         @param f_temp: Function to calculate current temperature from iteration round: temp = f_temp(iter_round)
         @param f_prob: Function to calculate acceptance probability for param candidate: prob = f_prob(delta_cost, temp)
-        @param termination: See Optimizer.
+        @param termination_checks: See Optimizer.
         """
-        super().__init__(f_cost, termination)
+        super().__init__(f_cost, termination_checks)
         self.f_update = f_update
         self.f_temp = f_temp
         self.f_prob = f_prob

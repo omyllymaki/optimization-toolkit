@@ -7,10 +7,16 @@ from numpy.linalg import pinv
 
 from src.gss import gss
 from src.optimizer import Optimizer
-from src.termination import TerminationCriteria as TC
+from src.termination import check_n_iter, check_absolute_cost, check_absolute_cost_diff
 from src.utils import diff, gradient, mse
 
 logger = logging.getLogger(__name__)
+
+TERMINATION_CHECKS = (
+    partial(check_n_iter, threshold=500),
+    partial(check_absolute_cost, threshold=1e-6),
+    partial(check_absolute_cost_diff, threshold=1e-9),
+)
 
 
 class GaussNewton(Optimizer):
@@ -30,9 +36,7 @@ class GaussNewton(Optimizer):
                  step_size_max_iter: int = 10,
                  step_size_lb: float = 0.0,
                  step_size_ub: float = 1.0,
-                 termination=TC(max_iter=500,
-                                cost_threshold=1e-6,
-                                cost_diff_threshold=1e-9)
+                 termination_checks=TERMINATION_CHECKS
                  ):
         """
         @param f_err: Function to calculate errors: errors = f_err(param). cost is mse(errors).
@@ -41,7 +45,7 @@ class GaussNewton(Optimizer):
         @param step_size_lb: lower bound for step size.
         @param step_size_ub: Upper bound for step size.
         @param step_size_ub: Upper bound for step size.
-        @param termination: See Optimizer.
+        @param termination_checks: See Optimizer.
         """
         self.f_err = f_err
         self.f_weights = f_weights
@@ -49,7 +53,7 @@ class GaussNewton(Optimizer):
         self.step_size_lb = step_size_lb
         self.step_size_ub = step_size_ub
         self.weights = None
-        super().__init__(self.f_cost, termination)
+        super().__init__(self.f_cost, termination_checks)
 
     def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
         param_delta = self._calculate_update_direction(param)

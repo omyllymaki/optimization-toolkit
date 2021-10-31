@@ -5,7 +5,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.gradient_descent import GradientDescent
-from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
 
@@ -44,10 +43,8 @@ def main():
 
     init_guess = - np.random.rand(3)
     max_iter = 5000
-    criteria = TerminationCriteria(max_iter=max_iter, cost_diff_threshold=-np.inf, max_iter_without_improvement=1000)
     optimizer = GradientDescent(
         f_cost=partial(f_cost, x=x, y=y_noisy, neg_penalty=1e8),
-        termination=criteria,
         f_step=partial(f_step, max_iter=max_iter, max_step=1e-9)
     )
     param, costs, params = optimizer.run(init_guess)

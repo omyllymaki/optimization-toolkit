@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.gradient_descent import GradientDescent
-from src.termination import TerminationCriteria
+from src.termination import check_n_iter
 from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
@@ -41,18 +41,18 @@ def main():
     y_noisy[indices] = OUTLIER_NOISE * np.random.randn(len(indices)) + OUTLIER_OFFSET
 
     init_guess = np.zeros(2)
-    criteria = TerminationCriteria(max_iter=200)
+    termination_checks = partial(check_n_iter, threshold=200)
     step_size = 1e-5
     f_step = lambda _: (0, step_size)
     optimizer_robust = GradientDescent(f_cost=partial(trimmed_cost, x=x, y=y_noisy, threshold=70),
-                                       termination=criteria,
+                                       termination_checks=termination_checks,
                                        f_step=f_step,
                                        step_size_max_iter=10)
     param_robust, costs_robust, _ = optimizer_robust.run(init_guess)
     y_estimate_robust = f_eval(x, param_robust)
 
     optimizer = GradientDescent(f_cost=partial(trimmed_cost, x=x, y=y_noisy, threshold=100),
-                                termination=criteria,
+                                termination_checks=termination_checks,
                                 f_step=f_step,
                                 step_size_max_iter=10)
     param, costs, _ = optimizer.run(init_guess)

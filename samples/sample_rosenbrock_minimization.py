@@ -7,7 +7,6 @@ from src.gradient_descent import GradientDescent
 from src.nelder_mead import generate_init_test_points, NelderMead
 from src.random_optimization import RandomOptimization
 from src.simulated_annealing import SimulatedAnnealing
-from src.termination import TerminationCriteria
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,17 +41,16 @@ def main():
             grid_costs.append(cost)
 
     init_guess = np.array([0, -2])
-    criteria = TerminationCriteria(max_iter=10000, cost_diff_threshold=-np.inf, max_iter_without_improvement=5000)
 
     f_scaling = lambda k: 0.995 ** k * np.ones(2)
     f_update = lambda p, k: p + 0.999 ** k * np.random.randn(2)
     f_temp = lambda k: 1.0 * np.exp(-0.01 * k)
     init_points_nm = generate_init_test_points(init_guess, 1.0)
     optimizers = {
-        "GD": (GradientDescent(f_cost=f_cost, f_step=f_step, termination=criteria), "darkorange"),
-        "RO": (RandomOptimization(f_cost=f_cost, f_scaling=f_scaling, termination=criteria), "red"),
-        "SA": (SimulatedAnnealing(f_cost=f_cost, f_update=f_update, f_temp=f_temp, termination=criteria), "cyan"),
-        "NM": (NelderMead(f_cost=f_cost, init_test_points=init_points_nm, termination=criteria), "brown")
+        "GD": (GradientDescent(f_cost=f_cost, f_step=f_step), "darkorange"),
+        "RO": (RandomOptimization(f_cost=f_cost, f_scaling=f_scaling), "red"),
+        "SA": (SimulatedAnnealing(f_cost=f_cost, f_update=f_update, f_temp=f_temp), "cyan"),
+        "NM": (NelderMead(f_cost=f_cost, init_test_points=init_points_nm), "brown")
     }
 
     plt.subplot(1, 2, 1)

@@ -5,7 +5,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.simulated_annealing import SimulatedAnnealing
-from src.termination import TerminationCriteria
 from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
@@ -36,10 +35,8 @@ def main():
     y_noisy = y + NOISE * np.random.randn(len(x))
 
     init_guess = np.zeros(3)
-    criteria = TerminationCriteria(max_iter=1000, cost_diff_threshold=-np.inf, max_iter_without_improvement=200)
     optimizer = SimulatedAnnealing(f_cost=partial(f_cost, x=x, y=y_noisy),
-                                   f_update=f_update,
-                                   termination=criteria)
+                                   f_update=f_update)
     param, costs, _ = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)
 

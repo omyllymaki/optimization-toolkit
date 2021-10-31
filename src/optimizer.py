@@ -1,10 +1,11 @@
 import logging
 from abc import abstractmethod, ABC
-from typing import Tuple, Callable
+from collections import Iterable
+from typing import Tuple, Callable, List, Union
 
 import numpy as np
 
-from src.termination import check_termination, TerminationCriteria
+from src.termination import check_termination
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +19,17 @@ class Optimizer(ABC):
 
     def __init__(self,
                  f_cost: Callable,
-                 termination: TerminationCriteria):
+                 termination_checks: Union[Tuple[Callable], Callable]):
         """
         @param f_cost: Function to calculate cost: cost = f_cost(param).
-        @param termination: Criteria for termination. Check all conditions and terminate if any of them is true.
+        @param termination_checks: This if function or tuple of functions that return true if iteration should be
+        terminated, otherwise false. All the functions will be checked and iteration is terminated if any of these
+        return true.
         """
         self.f_cost = f_cost
-        self.termination_criteria = termination
+        if not isinstance(termination_checks, Iterable):
+            termination_checks = (termination_checks,)
+        self.termination_checks = termination_checks
 
     def run(self,
             init_guess: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -55,7 +60,7 @@ class Optimizer(ABC):
                 min_cost = cost
                 final_param = param.copy()
 
-            if check_termination(np.array(costs), self.termination_criteria):
+            if check_termination(np.array(costs), self.termination_checks):
                 break
 
         return final_param, np.array(costs), params

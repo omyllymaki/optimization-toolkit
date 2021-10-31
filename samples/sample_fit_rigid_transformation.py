@@ -7,7 +7,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 from src.gradient_descent import GradientDescent
-from src.termination import TerminationCriteria
+from src.termination import check_n_iter
 from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
@@ -62,7 +62,8 @@ def main():
 
         init_guess = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         f_step = lambda _: (0, 0.1)
-        optimizer = GradientDescent(termination=TerminationCriteria(max_iter=300),
+        termination_checks = partial(check_n_iter, threshold=100)
+        optimizer = GradientDescent(termination_checks=termination_checks,
                                     f_cost=partial(f_cost, source=source, target=target),
                                     f_step=f_step)
         t1 = time.time()

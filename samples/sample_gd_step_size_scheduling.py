@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.gradient_descent import GradientDescent
-from src.termination import TerminationCriteria
+from src.termination import check_n_iter
 from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
@@ -41,10 +41,10 @@ def main():
 
     init_guess = np.random.randn(3)
     max_iter = 200
-    criteria = TerminationCriteria(max_iter=max_iter, cost_diff_threshold=-np.inf, max_iter_without_improvement=200)
+    termination_checks = partial(check_n_iter, threshold=200)
 
     optimizer = GradientDescent(f_cost=partial(f_cost, x=x, y=y_noisy),
-                                termination=criteria,
+                                termination_checks=termination_checks,
                                 f_step=partial(f_step, max_iter=max_iter))
     param, costs, _ = optimizer.run(init_guess)
     y_estimate = f_eval(x, param)

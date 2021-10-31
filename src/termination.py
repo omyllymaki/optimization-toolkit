@@ -1,45 +1,63 @@
 import logging
-import sys
+from typing import Tuple, Callable
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
 
-class TerminationCriteria:
-
-    def __init__(self,
-                 min_iter: int = 1,
-                 max_iter: int = 500,
-                 max_iter_without_improvement=None,
-                 cost_threshold: float = 1e-6,
-                 cost_diff_threshold: float = 1e-9):
-        self.min_iter = min_iter
-        self.max_iter = max_iter
-        self.max_iter_without_improvement = max_iter_without_improvement
-        self.cost_threshold = cost_threshold
-        self.cost_diff_threshold = cost_diff_threshold
-
-
-def check_termination(costs: np.ndarray, parameters: TerminationCriteria) -> bool:
-    n_rounds = len(costs)
-    current_cost = costs[-1]
-    if n_rounds > 1:
-        diff = costs[-2] - costs[-1]
-        if diff <= parameters.cost_diff_threshold and n_rounds >= parameters.min_iter:
-            logger.info("Cost difference between iterations smaller than tolerance. Fit terminated.")
+def check_termination(costs: np.ndarray, checks: Tuple[Callable]) -> bool:
+    for check in checks:
+        if check(costs):
             return True
-    if current_cost <= parameters.cost_threshold and n_rounds >= parameters.min_iter:
-        logger.info("Cost smaller than tolerance. Fit terminated.")
-        return True
-    if n_rounds >= parameters.max_iter:
-        logger.info("Max number of iterations reached.")
-        return True
-    if parameters.max_iter_without_improvement is not None and n_rounds >= parameters.max_iter_without_improvement:
-        latest_costs = costs[-parameters.max_iter_without_improvement:]
-        i_min = np.argmin(latest_costs)
-        if i_min == 0:
-            logger.info("Max number of iterations without improvement reached.")
-            return True
-
     return False
+
+
+def check_n_iter(costs: np.ndarray, threshold: int) -> bool:
+    if len(costs) >= threshold:
+        logger.info(f"Max number of iterations reached: {threshold}")
+        return True
+    else:
+        return False
+
+
+def check_absolute_cost(costs: np.ndarray, threshold: float) -> bool:
+    if costs[-1] <= threshold:
+        logger.info(f"Cost is smaller than or equal to threshold: {costs[-1]} <= {threshold}")
+        return True
+    else:
+        return False
+
+
+def check_absolute_cost_diff(costs: np.ndarray, threshold: float, n: int = 2) -> bool:
+    if len(costs) < n:
+        return False
+    diff = costs[-n] - costs[-1]
+    if diff <= threshold:
+        logger.info(f"Cost difference is smaller than or equal to threshold: {diff} <= {threshold}")
+        return True
+    else:
+        return False
+
+
+def check_relative_cost_diff(costs: np.ndarray, threshold: float, n: int = 2) -> bool:
+    if len(costs) < n:
+        return False
+    rel_diff = (costs[-n] - costs[-1]) / costs[-1]
+    if rel_diff <= threshold:
+        logger.info(f"Relative cost difference is smaller than or equal to threshold: {rel_diff} <= {threshold}")
+        return True
+    else:
+        return False
+
+
+def check_n_iter_without_improvement(costs: np.ndarray, threshold: int) -> bool:
+    if len(costs) < threshold:
+        return False
+    latest_costs = costs[-threshold:]
+    i_min = np.argmin(latest_costs)
+    if i_min == 0:
+        logger.info(f"Max number of iterations without improvement reached: {threshold}")
+        return True
+    else:
+        return False
