@@ -24,18 +24,18 @@ def f_cost(param, a=1, b=100):
 
 
 def f_step(iter_round, max_iter=10000):
-    r = (iter_round / max_iter) * np.pi / 2
-    step_size_ub = np.sin(r) * 5e-2  # Max step size will vary from 0 -> 1e-4
+    r = (iter_round / max_iter) * np.pi
+    step_size_ub = np.sin(r) * 2e-2  # Max step size will vary from 0 -> 1e-4
     step_size_lb = 0
-    return step_size_lb, step_size_ub
+    return 0, 2e-2
 
 
 # This is needed for Gauss-newton
 # Here we define f_err so that f_cost = mse(f_err) = sum(f_err^2)
-# In practice, f_cost = e1^2 + e2^2 = (a - param[0])^2 + b*(param[1] - param[0]^2)^2
+# In practice, f_cost = 0.5*(e1^2 + e2^2) = (a - param[0])^2 + b*(param[1] - param[0]^2)^2
 def f_err(param, a=1, b=100):
-    e1 = a - param[0]
-    e2 = np.sqrt(b) * (param[1] - param[0] ** 2)
+    e1 = np.sqrt(2) * (a - param[0])
+    e2 = np.sqrt(2 / b) * (param[1] - param[0] ** 2)
     return np.array([e1, e2])
 
 
@@ -50,8 +50,9 @@ def main():
             cost = f_cost(np.array([p1, p2]))
             grid_costs.append(cost)
 
-    init_guess = np.array([0, -2])
+    init_guess = np.array([0.0, -2.0])
 
+    f_step = lambda _: (0, 4e-2)
     f_scaling = lambda k: 0.995 ** k * np.ones(2)
     f_update = lambda p, k: p + 0.999 ** k * np.random.randn(2)
     f_temp = lambda k: 1.0 * np.exp(-0.01 * k)
