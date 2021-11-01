@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.gauss_newton import GaussNewton
+from src.search import run_multiple
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,6 +41,10 @@ def f_err(param, x, y, f):
     return y_estimate - y
 
 
+def f_init_guess(n_dim):
+    return np.random.randn(n_dim)
+
+
 fset = (
     (f1, 2),
     (f2, 3),
@@ -57,21 +62,14 @@ for f, dim in fset:
         print(f"Test run {k}")
         true_param = np.random.randn(dim)
         y = f(x, true_param)
-        optimizer = GaussNewton(partial(f_err, x=x, y=y, f=f),
-                                step_size_max_iter=20)
-        for i in range(50):
-            init_guess = np.random.rand(dim)
-            param, costs, _ = optimizer.run(init_guess)
-            y_estimate = f(x, param)
-            residual = y_estimate - y
-            rmse = np.sqrt(np.sum(residual ** 2))
+        optimizer = GaussNewton(partial(f_err, x=x, y=y, f=f), step_size_max_iter=20)
 
-            if rmse < 1e-3:
-                break
+        param, costs, all_params = run_multiple(optimizer, f_init_guess=partial(f_init_guess, n_dim=dim))
+        y_estimate = f(x, param)
 
         plt.subplot(4, 4, k + 1)
         plt.plot(x, y, "b-")
         plt.plot(x, y_estimate, "r-")
-        plt.title(f"{rmse:0.3f}")
+        plt.title(f"{np.min(costs):0.3f}")
 
 plt.show()
