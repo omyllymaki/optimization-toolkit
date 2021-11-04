@@ -48,6 +48,7 @@ class Optimizer(ABC):
         costs = [cost]
         params = param.copy()
         iter_round = 0
+        logger.info(f"Init cost: {cost:0.5f}")
         while True:
 
             param, cost = self.update(param, iter_round, cost)
