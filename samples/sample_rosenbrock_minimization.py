@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 
 from src.gauss_newton import GaussNewton
 from src.gradient_descent import GradientDescent
+from src.levenberg_marquardt import LevenbergMarquardt
 from src.nelder_mead import generate_init_test_points, NelderMead
 from src.random_optimization import RandomOptimization
 from src.simulated_annealing import SimulatedAnnealing
@@ -19,7 +20,7 @@ def f_update(param, k):
     return param + scaling_factors * np.random.randn(param.shape[0])
 
 
-def f_cost(param, a=1, b=100):
+def f_cost(param, a=1, b=10):
     return (a - param[0]) ** 2 + b * (param[1] - param[0] ** 2) ** 2
 
 
@@ -42,7 +43,7 @@ def f_err(param, a=1, b=100):
 def main():
     true_minimum = np.array([1, 1])
 
-    grid = np.arange(-3, 3, 0.01)
+    grid = np.arange(-5, 5, 0.01)
 
     grid_costs = []
     for i, p1 in enumerate(grid):
@@ -50,16 +51,18 @@ def main():
             cost = f_cost(np.array([p1, p2]))
             grid_costs.append(cost)
 
-    init_guess = np.array([0.0, -2.0])
+    # init_guess = np.array([0.0, -2.0])
+    init_guess = np.array([-2.0, 2.0])
 
-    f_step = lambda _: (0, 4e-2)
+    f_step = lambda _: (0, 2e-2)
     f_scaling = lambda k: 0.995 ** k * np.ones(2)
     f_update = lambda p, k: p + 0.999 ** k * np.random.randn(2)
     f_temp = lambda k: 1.0 * np.exp(-0.01 * k)
     init_points_nm = generate_init_test_points(init_guess, 1.0)
     optimizers = {
         "GD": (GradientDescent(f_cost=f_cost, f_step=f_step), "darkorange"),
-        "GN": (GaussNewton(f_err=f_err), "darkblue"),
+        "GN": (GaussNewton(f_err=f_err, step_size_max_iter=0), "darkblue"),
+        "LMA": (LevenbergMarquardt(f_err=f_err), "olive"),
         "RO": (RandomOptimization(f_cost=f_cost, f_scaling=f_scaling), "red"),
         "SA": (SimulatedAnnealing(f_cost=f_cost, f_update=f_update, f_temp=f_temp), "cyan"),
         "NM": (NelderMead(f_cost=f_cost, init_test_points=init_points_nm), "darkviolet")
@@ -81,6 +84,7 @@ def main():
         plt.subplot(1, 2, 2)
         plt.plot(costs, "-", label=name, color=color)
         plt.yscale("log")
+        plt.xscale("log")
         plt.legend()
 
     plt.subplot(1, 2, 1)
