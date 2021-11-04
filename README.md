@@ -30,11 +30,16 @@ Solve optimal parameters that will minimize the cost, using selected optimizatio
 ## Supported optimization methods
 
 Currently, following optimization methods are supported:
+
+**Gradient-based**
 - Gradient Descent
+- Levenberg-Marquardt
 - Gauss-Newton
   * Classical GN 
   * Damped GN
   * Iterative reweighting
+
+**Gradient-free**
 - Nelder-Mead
 - Random Optimization
 - Simulated Annealing
