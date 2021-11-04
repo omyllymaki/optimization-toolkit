@@ -30,7 +30,7 @@ class LevenbergMarquardt(Optimizer):
     """
 
     def __init__(self,
-                 f_err: Callable = diff,
+                 f_err: Callable,
                  damping_factor_scaling=2.0,
                  termination_checks=TERMINATION_CHECKS
                  ):

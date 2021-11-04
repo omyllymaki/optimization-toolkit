@@ -47,7 +47,7 @@ class SimulatedAnnealing(Optimizer):
 
     def __init__(self,
                  f_update: Callable,
-                 f_cost: Callable = mse,
+                 f_cost: Callable,
                  f_temp: Callable = temp_decay,
                  f_prob: Callable = acceptance_probability,
                  termination_checks=TERMINATION_CHECKS

@@ -24,7 +24,7 @@ class RandomOptimization(Optimizer):
 
     def __init__(self,
                  f_scaling: Callable,
-                 f_cost: Callable = mse,
+                 f_cost: Callable,
                  termination_checks=TERMINATION_CHECKS,
                  ):
         """

@@ -35,7 +35,7 @@ class GaussNewton(Optimizer):
     """
 
     def __init__(self,
-                 f_err: Callable = diff,
+                 f_err: Callable,
                  f_weights: Callable = None,
                  step_size_max_iter: int = 10,
                  step_size_lb: float = 0.0,
