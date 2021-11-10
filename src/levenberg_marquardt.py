@@ -68,7 +68,7 @@ class LevenbergMarquardt(Optimizer):
         if self.damping_factor is None:
             self.damping_factor = np.max(np.diag(jj))
         correction = np.diag(self.damping_factor * np.diag(jj))
-        return pinv(jac.T @ jac + correction) @ jac.T @ errors
+        return pinv(jj + correction) @ jac.T @ errors
 
     def f_cost(self, param):
         return mse(self.f_err(param))
