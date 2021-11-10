@@ -115,7 +115,7 @@ class NelderMead(Optimizer):
         elif (cost_reflected >= cost_second_worst) and (cost_reflected < cost_worst):
             self._outside_contraction_or_shrink(centroid, reflected_point, cost_reflected)
         else:
-            self.inside_contraction_or_shrink(centroid, reflected_point, cost_worst)
+            self._inside_contraction_or_shrink(centroid, reflected_point, cost_worst)
 
         # Sort based on costs
         indices = np.argsort(self.point_costs)
@@ -158,7 +158,7 @@ class NelderMead(Optimizer):
         else:
             self._shrink()
 
-    def inside_contraction_or_shrink(self, centroid, reflected_point, cost_worst):
+    def _inside_contraction_or_shrink(self, centroid, reflected_point, cost_worst):
         point_contracted = centroid - self.contraction_factor * (reflected_point - centroid)
         cost_contracted = self.f_cost(point_contracted)
         if cost_contracted <= cost_worst:
