@@ -4,8 +4,8 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.gauss_newton import GaussNewton
-from src.levenberg_marquardt import LevenbergMarquardt
+from src.local_optimization.gauss_newton import GaussNewton
+from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 
 logging.basicConfig(level=logging.INFO)
 

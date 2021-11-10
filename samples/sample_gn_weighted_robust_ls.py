@@ -4,7 +4,7 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.gauss_newton import GaussNewton
+from src.local_optimization.gauss_newton import GaussNewton
 from src.termination import check_n_iter
 
 logging.basicConfig(level=logging.INFO)

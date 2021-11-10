@@ -4,8 +4,8 @@ from typing import Tuple
 
 import numpy as np
 
-from src.gss import gss
-from src.optimizer import Optimizer
+from src.local_optimization.gss import gss
+from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
 from src.utils import gradient
 
@@ -18,7 +18,7 @@ TERMINATION_CHECKS = (
 )
 
 
-class GradientDescent(Optimizer):
+class GradientDescent(LocalOptimizer):
     """
     Gradient descent optimizer.
 
@@ -33,10 +33,10 @@ class GradientDescent(Optimizer):
                  termination_checks=TERMINATION_CHECKS
                  ):
         """
-        @param f_cost: See Optimizer.
+        @param f_cost: See LocalOptimizer.
         @param f_step: Function to calculate step size bounds for every iteration: lb, ub = f_step(iter_round)
         @param step_size_max_iter: Number of iterations for optimal step size search.
-        @param termination_checks: See Optimizer.
+        @param termination_checks: See LocalOptimizer.
         """
         super().__init__(f_cost, termination_checks)
         self.f_step = f_step

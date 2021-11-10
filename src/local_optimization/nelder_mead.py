@@ -4,7 +4,7 @@ from typing import Callable, Tuple
 
 import numpy as np
 
-from src.optimizer import Optimizer
+from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
 
 TERMINATION_CHECKS = (
@@ -41,7 +41,7 @@ def get_factors(n_dim):
     return reflection_factor, expansion_factor, contraction_factor, shrink_factor
 
 
-class NelderMead(Optimizer):
+class NelderMead(LocalOptimizer):
     """
     Nelder-Mead optimizer.
 
@@ -72,13 +72,13 @@ class NelderMead(Optimizer):
                  ):
         """
 
-        @param f_cost: See Optimizer.
+        @param f_cost: See LocalOptimizer.
         @param f_points: Function to generate initial test points from init guess: test_points = f_points(init_guess).
         @param reflection_factor: Step size to generate reflected point.
         @param expansion_factor: Step size to generate expanded point (> 1).
         @param contraction_factor: Step size to generate contracted point (< 1).
         @param shrink_factor: Step size to shrink points towards best point (< 1).
-        @param termination_checks: See Optimizer.
+        @param termination_checks: See LocalOptimizer.
         """
         super().__init__(f_cost, termination_checks)
         self.f_points = f_points

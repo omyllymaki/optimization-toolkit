@@ -4,7 +4,7 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.random_optimization import RandomOptimization
+from src.local_optimization.random_optimization import RandomOptimization
 from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)

@@ -5,8 +5,8 @@ from typing import Tuple, Callable
 import numpy as np
 from numpy.linalg import pinv
 
-from src.gss import gss
-from src.optimizer import Optimizer
+from src.local_optimization.gss import gss
+from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_absolute_cost, check_absolute_cost_diff
 from src.utils import gradient, mse
 
@@ -19,7 +19,7 @@ TERMINATION_CHECKS = (
 )
 
 
-class GaussNewton(Optimizer):
+class GaussNewton(LocalOptimizer):
     """
     Gauss-Newton optimizer.
 
@@ -49,7 +49,7 @@ class GaussNewton(Optimizer):
         @param step_size_lb: lower bound for step size.
         @param step_size_ub: Upper bound for step size.
         @param step_size_ub: Upper bound for step size.
-        @param termination_checks: See Optimizer.
+        @param termination_checks: See LocalOptimizer.
         """
         self.f_err = f_err
         self.f_weights = f_weights

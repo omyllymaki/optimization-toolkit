@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
-from src.levenberg_marquardt import LevenbergMarquardt
+from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 from src.termination import check_n_iter, check_absolute_cost_diff
 from src.utils import mse
 

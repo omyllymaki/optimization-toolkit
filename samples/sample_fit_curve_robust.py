@@ -4,7 +4,7 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.gradient_descent import GradientDescent
+from src.local_optimization.gradient_descent import GradientDescent
 from src.termination import check_n_iter
 from src.utils import mse
 

@@ -21,7 +21,7 @@ pip3 install -r requirements.txt
 
 ## What does this do?
 
-Given termination criteria and cost function f_cost 
+Given termination criteria and cost function f_cost
 
 cost = f_cost(parameters),
 
@@ -31,18 +31,24 @@ Solve optimal parameters that will minimize the cost, using selected optimizatio
 
 Currently, following optimization methods are supported:
 
-**Gradient-based**
+**Local optimization, gradient-based**
+
 - Gradient Descent
 - Levenberg-Marquardt
 - Gauss-Newton
-  * Classical GN 
-  * Damped GN
-  * Iterative reweighting
+    * Classical GN
+    * Damped GN
+    * Iterative reweighting
 
-**Gradient-free**
+**Local optimization, gradient-free**
+
 - Nelder-Mead
 - Random Optimization
 - Simulated Annealing
+
+**Global optimization**
+
+- Multi start optimizer; runs specified local optimizer with multiple init guesses
 
 All the methods can be configured flexibly with callbacks.
 

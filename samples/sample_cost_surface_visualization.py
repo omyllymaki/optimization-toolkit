@@ -4,12 +4,12 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.gauss_newton import GaussNewton
-from src.gradient_descent import GradientDescent
-from src.levenberg_marquardt import LevenbergMarquardt
-from src.nelder_mead import NelderMead, generate_init_test_points
-from src.random_optimization import RandomOptimization
-from src.simulated_annealing import SimulatedAnnealing
+from src.local_optimization.gauss_newton import GaussNewton
+from src.local_optimization.gradient_descent import GradientDescent
+from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
+from src.local_optimization.nelder_mead import NelderMead
+from src.local_optimization.random_optimization import RandomOptimization
+from src.local_optimization.simulated_annealing import SimulatedAnnealing
 from src.utils import mse
 
 logging.basicConfig(level=logging.WARNING)

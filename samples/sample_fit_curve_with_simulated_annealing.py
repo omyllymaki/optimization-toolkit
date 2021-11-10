@@ -4,7 +4,7 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.simulated_annealing import SimulatedAnnealing
+from src.local_optimization.simulated_annealing import SimulatedAnnealing
 from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)

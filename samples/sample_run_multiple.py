@@ -4,8 +4,8 @@ from functools import partial
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.gauss_newton import GaussNewton
-from src.search import run_multiple
+from src.global_optimization.multi_start_optimizer import MultiStartOptimizer
+from src.local_optimization.gauss_newton import GaussNewton
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,7 +21,7 @@ def f_err(param, x, y):
     return y_estimate - y
 
 
-def f_init_guess():
+def f_init_guess(params, costs):
     return np.random.randn(5)
 
 
@@ -30,10 +30,11 @@ def main():
     true_param = np.random.randn(5)
     y = f_eval(x, true_param)
     y_noisy = y + 0.01 * np.random.randn(len(y))
-    init_guess = np.random.randn(5)
-    optimizer = GaussNewton(partial(f_err, x=x, y=y_noisy), step_size_max_iter=5)
 
-    best_param, costs, all_params = run_multiple(optimizer, f_init_guess=f_init_guess)
+    local_optimizer = GaussNewton(partial(f_err, x=x, y=y_noisy), step_size_max_iter=5)
+    global_optimizer = MultiStartOptimizer(optimizer=local_optimizer, f_init_guess=f_init_guess)
+
+    best_param, costs, all_params = global_optimizer.run()
     i_min = np.argmin(costs)
     i_max = np.argmax(costs)
 

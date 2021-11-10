@@ -5,7 +5,7 @@ from typing import Tuple, Callable
 
 import numpy as np
 
-from src.optimizer import Optimizer
+from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def acceptance_probability(delta_cost: float, temperature: float) -> float:
     return np.exp(-delta_cost / temperature)
 
 
-class SimulatedAnnealing(Optimizer):
+class SimulatedAnnealing(LocalOptimizer):
     """
     Simulated annealing optimizer.
 
@@ -53,10 +53,10 @@ class SimulatedAnnealing(Optimizer):
                  ):
         """
         @param f_update: Function to generate param candidate: param_candidate = f_update(param, iter_round)
-        @param f_cost: See Optimizer.
+        @param f_cost: See LocalOptimizer.
         @param f_temp: Function to calculate current temperature from iteration round: temp = f_temp(iter_round)
         @param f_prob: Function to calculate acceptance probability for param candidate: prob = f_prob(delta_cost, temp)
-        @param termination_checks: See Optimizer.
+        @param termination_checks: See LocalOptimizer.
         """
         super().__init__(f_cost, termination_checks)
         self.f_update = f_update

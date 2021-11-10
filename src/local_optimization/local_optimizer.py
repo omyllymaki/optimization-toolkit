@@ -10,9 +10,9 @@ from src.termination import check_termination
 logger = logging.getLogger(__name__)
 
 
-class Optimizer(ABC):
+class LocalOptimizer(ABC):
     """
-    Base class for optimization.
+    Base class for local optimization.
 
     Inheritors need to implement update function that updates parameters that needs to be solved.
     """
@@ -31,8 +31,7 @@ class Optimizer(ABC):
             termination_checks = (termination_checks,)
         self.termination_checks = termination_checks
 
-    def run(self,
-            init_guess: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def run(self, init_guess: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Run optimization.
 

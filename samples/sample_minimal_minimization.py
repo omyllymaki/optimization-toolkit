@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from src.gradient_descent import GradientDescent
+from src.local_optimization.gradient_descent import GradientDescent
 
 logging.basicConfig(level=logging.INFO)
 

@@ -3,7 +3,7 @@ from typing import Tuple, Callable
 
 import numpy as np
 
-from src.optimizer import Optimizer
+from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
 
 TERMINATION_CHECKS = (
@@ -13,7 +13,7 @@ TERMINATION_CHECKS = (
 )
 
 
-class RandomOptimization(Optimizer):
+class RandomOptimization(LocalOptimizer):
     """
     Random optimization optimizer.
 
@@ -28,8 +28,8 @@ class RandomOptimization(Optimizer):
                  ):
         """
         @param f_scaling: Function to scaling of parameter update: scale_factors = f_scaling(iter_round)
-        @param f_cost: see Optimizer.
-        @param termination_checks: See Optimizer.
+        @param f_cost: see LocalOptimizer.
+        @param termination_checks: See LocalOptimizer.
         """
         super().__init__(f_cost, termination_checks)
         self.f_scaling = f_scaling

@@ -5,7 +5,7 @@ from typing import Tuple, Callable
 import numpy as np
 from numpy.linalg import pinv
 
-from src.optimizer import Optimizer
+from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
 from src.utils import gradient, mse
 
@@ -18,7 +18,7 @@ TERMINATION_CHECKS = (
 )
 
 
-class LevenbergMarquardt(Optimizer):
+class LevenbergMarquardt(LocalOptimizer):
     """
     Levenberg-Marquardt (LMA) optimization method.
 
@@ -37,7 +37,7 @@ class LevenbergMarquardt(Optimizer):
         """
         @param f_err: Function to calculate errors: errors = f_err(param). cost is then calculated as MSE(errors).
         @param damping_factor_scaling: Scale factor to change damping factor at every iteration (> 1).
-        @param termination_checks: See Optimizer.
+        @param termination_checks: See LocalOptimizer.
         """
         self.f_err = f_err
         self.weights = None
