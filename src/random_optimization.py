@@ -5,7 +5,6 @@ import numpy as np
 
 from src.optimizer import Optimizer
 from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost
-from src.utils import mse
 
 TERMINATION_CHECKS = (
     partial(check_n_iter, threshold=10000),

@@ -1,7 +1,7 @@
 import logging
 from abc import abstractmethod, ABC
 from collections import Iterable
-from typing import Tuple, Callable, List, Union
+from typing import Tuple, Callable, Union
 
 import numpy as np
 

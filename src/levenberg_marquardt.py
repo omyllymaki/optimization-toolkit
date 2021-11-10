@@ -7,7 +7,7 @@ from numpy.linalg import pinv
 
 from src.optimizer import Optimizer
 from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
-from src.utils import diff, gradient, mse
+from src.utils import gradient, mse
 
 logger = logging.getLogger(__name__)
 
