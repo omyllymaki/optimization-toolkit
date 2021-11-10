@@ -16,9 +16,9 @@ TERMINATION_CHECKS = (
 logger = logging.getLogger(__name__)
 
 
-def generate_init_test_points(param, scale):
+def generate_init_test_points(param, scale=1):
     """
-    Helper function to generate initial test points for Nelder-Mead optimizer.
+    Generate initial test points around param.
     """
     n_dim = len(param)
     points = param.copy()
@@ -63,7 +63,7 @@ class NelderMead(Optimizer):
 
     def __init__(self,
                  f_cost: Callable,
-                 init_test_points: np.ndarray,
+                 f_points: Callable = generate_init_test_points,
                  reflection_factor: float = 1.0,
                  expansion_factor: float = 2.0,
                  contraction_factor: float = 0.5,
@@ -73,7 +73,7 @@ class NelderMead(Optimizer):
         """
 
         @param f_cost: See Optimizer.
-        @param init_test_points: Initial test points (n_param + 1 points).
+        @param f_points: Function to generate initial test points from init guess: test_points = f_points(init_guess).
         @param reflection_factor: Step size to generate reflected point.
         @param expansion_factor: Step size to generate expanded point (> 1).
         @param contraction_factor: Step size to generate contracted point (< 1).
@@ -81,19 +81,18 @@ class NelderMead(Optimizer):
         @param termination_checks: See Optimizer.
         """
         super().__init__(f_cost, termination_checks)
-        self.init_test_points = init_test_points
+        self.f_points = f_points
         self.reflection_factor = reflection_factor
         self.expansion_factor = expansion_factor
         self.contraction_factor = contraction_factor
         self.shrink_factor = shrink_factor
-
-        self.points = init_test_points.copy()
-        self.point_costs = np.array([self.f_cost(p) for p in self.points])
-        indices = np.argsort(self.point_costs)
-        self.points = self.points[indices]
-        self.point_costs = self.point_costs[indices]
+        self.points = None
 
     def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
+
+        # At first iteration, generate initial test points
+        if self.points is None:
+            self._generate_init_test_points(param)
 
         # Centroid of test points, worst point not included
         centroid = np.mean(self.points[:-1], axis=0)
@@ -124,6 +123,13 @@ class NelderMead(Optimizer):
         self.point_costs = self.point_costs[indices]
 
         return self.points[0], self.point_costs[0]
+
+    def _generate_init_test_points(self, param):
+        self.points = self.f_points(param)
+        self.point_costs = np.array([self.f_cost(p) for p in self.points])
+        indices = np.argsort(self.point_costs)
+        self.points = self.points[indices]
+        self.point_costs = self.point_costs[indices]
 
     def _expansion_or_reflection(self, centroid, reflected_point, cost_reflected):
         expanded_point = centroid + self.expansion_factor * (reflected_point - centroid)

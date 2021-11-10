@@ -51,21 +51,19 @@ def main():
             cost = f_cost(np.array([p1, p2]))
             grid_costs.append(cost)
 
-    # init_guess = np.array([0.0, -2.0])
     init_guess = np.array([-2.0, 2.0])
 
     f_step = lambda _: (0, 2e-2)
     f_scaling = lambda k: 0.995 ** k * np.ones(2)
     f_update = lambda p, k: p + 0.999 ** k * np.random.randn(2)
     f_temp = lambda k: 1.0 * np.exp(-0.01 * k)
-    init_points_nm = generate_init_test_points(init_guess, 1.0)
     optimizers = {
         "GD": (GradientDescent(f_cost=f_cost, f_step=f_step), "darkorange"),
         "GN": (GaussNewton(f_err=f_err, step_size_max_iter=0), "darkblue"),
         "LMA": (LevenbergMarquardt(f_err=f_err), "olive"),
         "RO": (RandomOptimization(f_cost=f_cost, f_scaling=f_scaling), "red"),
         "SA": (SimulatedAnnealing(f_cost=f_cost, f_update=f_update, f_temp=f_temp), "cyan"),
-        "NM": (NelderMead(f_cost=f_cost, init_test_points=init_points_nm), "darkviolet")
+        "NM": (NelderMead(f_cost=f_cost), "darkviolet")
     }
 
     plt.subplot(1, 2, 1)

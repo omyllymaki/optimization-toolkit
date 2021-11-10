@@ -63,14 +63,13 @@ def main():
     f_scaling = lambda k: 0.995 ** k * np.ones(2)
     f_update = lambda p, k: p + 0.995 ** k * np.random.randn(2)
     f_temp = lambda k: 0.2 * np.exp(-0.05 * k)
-    init_points_nm = generate_init_test_points(init_guess, 0.1)
     optimizers = {
         "GN": (GaussNewton(f_err=partial(f_err, x=x, y=y)), "darkblue"),
         "LMA": (LevenbergMarquardt(f_err=partial(f_err, x=x, y=y)), "olive"),
         "GD": (GradientDescent(f_cost=partial(f_cost, x=x, y=y), f_step=f_step), "darkorange"),
         "RO": (RandomOptimization(f_cost=partial(f_cost, x=x, y=y), f_scaling=f_scaling), "red"),
         "SA": (SimulatedAnnealing(f_cost=partial(f_cost, x=x, y=y), f_update=f_update, f_temp=f_temp), "cyan"),
-        "NM": (NelderMead(f_cost=partial(f_cost, x=x, y=y), init_test_points=init_points_nm), "darkviolet")
+        "NM": (NelderMead(f_cost=partial(f_cost, x=x, y=y)), "darkviolet")
     }
 
     for name, (optimizer, color) in optimizers.items():
