@@ -7,7 +7,7 @@ from numpy.linalg import pinv
 
 from src.local_optimization.gss import gss
 from src.local_optimization.local_optimizer import LocalOptimizer
-from src.termination import check_n_iter, check_absolute_cost, check_absolute_cost_diff
+from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
 from src.utils import gradient, mse
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 TERMINATION_CHECKS = (
     partial(check_n_iter, threshold=500),
     partial(check_absolute_cost, threshold=1e-6),
-    partial(check_absolute_cost_diff, threshold=1e-9),
+    partial(check_n_iter_without_improvement, threshold=5)
 )
 
 
