@@ -35,9 +35,9 @@ def f_step(iter_round, max_iter=10000):
 # Here we define f_err so that f_cost = mse(f_err) = sum(f_err^2)
 # In practice, f_cost = 0.5*(e1^2 + e2^2) = (a - param[0])^2 + b*(param[1] - param[0]^2)^2
 def f_err(param, a=1, b=100):
-    e1 = np.sqrt(2) * (a - param[0])
-    e2 = np.sqrt(2 / b) * (param[1] - param[0] ** 2)
-    return np.array([e1, e2])
+    e1 = a - param[0]
+    e2 = np.sqrt(b) * (param[1] - param[0] ** 2)
+    return np.sqrt(2) * np.array([e1, e2])
 
 
 def main():
