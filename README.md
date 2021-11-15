@@ -93,10 +93,26 @@ Samples folder contains multiple samples. Run all samples by typing:
 
 ## Examples
 
-### Rosenbrock function
+### Rosenbrock function minimization with various methods
 
 Sample: samples/sample_rosenbrock_minimization.py:
 
 <p align="center">
 <img src="samples/screenshots/rosenbrock_function_minimization.jpg" width="800px" />
+</p>
+
+### Constrained optimization using penalty method
+
+Sample: samples/sample_penalty_method.py:
+
+<p align="center">
+<img src="samples/screenshots/constrained_optimization_penalty_method.jpg" width="800px" />
+</p>
+
+### Robust curve fitting using iteratively reweighted least squares
+
+Sample: samples/sample_gn_weighted_robust_ls.py:
+
+<p align="center">
+<img src="samples/screenshots/robust_curve_fitting_irls.jpg" width="800px" />
 </p>
