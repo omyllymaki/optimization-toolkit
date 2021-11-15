@@ -26,7 +26,7 @@ def temp_decay(t: int, max_temperature=1.0, decay_constant=0.005) -> float:
 
 def acceptance_probability(delta_cost: float, temperature: float) -> float:
     """
-    Calculate acceptance probability for param candidate, based on cost change (vs. current solution) and
+    Calculate acceptance probability for x candidate, based on cost change (vs. current solution) and
     temperature.
     """
     if delta_cost < 0:
@@ -40,7 +40,7 @@ class SimulatedAnnealing(LocalOptimizer):
     """
     Simulated annealing optimizer.
 
-    Generate new parameter candidate. Replace the current parameters with the candidate with probability that depends on
+    Generate new variables candidate. Replace the current variables with the candidate with probability that depends on
     cost difference and temperature.
     """
 
@@ -52,10 +52,10 @@ class SimulatedAnnealing(LocalOptimizer):
                  termination_checks=TERMINATION_CHECKS
                  ):
         """
-        @param f_update: Function to generate param candidate: param_candidate = f_update(param, iter_round)
+        @param f_update: Function to generate x candidate: x_candidate = f_update(x, iter_round)
         @param f_cost: See LocalOptimizer.
         @param f_temp: Function to calculate current temperature from iteration round: temp = f_temp(iter_round)
-        @param f_prob: Function to calculate acceptance probability for param candidate: prob = f_prob(delta_cost, temp)
+        @param f_prob: Function to calculate acceptance probability for x candidate: prob = f_prob(delta_cost, temp)
         @param termination_checks: See LocalOptimizer.
         """
         super().__init__(f_cost, termination_checks)
@@ -63,15 +63,15 @@ class SimulatedAnnealing(LocalOptimizer):
         self.f_temp = f_temp
         self.f_prob = f_prob
 
-    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
+    def update(self, x, iter_round, cost) -> Tuple[np.ndarray, float]:
         temperature = self.f_temp(iter_round)
-        param_candidate = self.f_update(param.copy(), iter_round)
-        param_candidate_cost = self.f_cost(param_candidate)
-        delta_cost = param_candidate_cost - cost
+        x_candidate = self.f_update(x.copy(), iter_round)
+        candidate_cost = self.f_cost(x_candidate)
+        delta_cost = candidate_cost - cost
         prob = self.f_prob(delta_cost, temperature)
         logger.info(f"temp: {temperature} | delta cost {delta_cost} | prob {prob}")
         if prob >= random.uniform(0.0, 1.0):
             logger.info(f"Update solution!")
-            return param_candidate, param_candidate_cost
+            return x_candidate, candidate_cost
         else:
-            return param, cost
+            return x, cost

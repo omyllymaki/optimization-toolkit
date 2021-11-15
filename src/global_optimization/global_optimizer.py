@@ -19,6 +19,6 @@ class GlobalOptimizer(ABC):
         Run global optimization.
 
         @return: Tuple containing
-        (final solution for parameters, costs from iteration, list of parameter values from iteration)
+        (final solution, costs from iteration, variable values from iteration)
         """
         raise NotImplementedError

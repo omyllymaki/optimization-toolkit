@@ -20,10 +20,10 @@ TERMINATION_CHECKS = (
 
 class GradientDescent(LocalOptimizer):
     """
-    Gradient descent optimizer.
+    Gradient Descent optimizer.
 
-    Minimize given cost function by optimizing parameters using Gradient descent method. Change step size adaptively
-    for every iteration according to given input parameters.
+    Minimize given cost function using Gradient descent method. Change step size adaptively for every iteration 
+    according to given input parameters.
     """
 
     def __init__(self,
@@ -44,26 +44,26 @@ class GradientDescent(LocalOptimizer):
         self.step_size_lb = None
         self.step_size_ub = None
 
-    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
+    def update(self, x, iter_round, cost) -> Tuple[np.ndarray, float]:
         self.step_size_lb, self.step_size_ub = self.f_step(iter_round)
         logger.debug(f"Step size range: [{self.step_size_lb}, {self.step_size_ub}]")
-        param_delta = self._calculate_update_direction(param)
-        step_size = self._find_step_size(param, param_delta)
-        param = param - step_size * param_delta
-        cost = self.f_cost(param)
+        x_delta = self._calculate_update_direction(x)
+        step_size = self._find_step_size(x, x_delta)
+        x = x - step_size * x_delta
+        cost = self.f_cost(x)
         logger.debug(f"Cost {cost:0.3f}, step size {step_size}")
-        return param, cost
+        return x, cost
 
-    def _calculate_update_direction(self, param) -> np.ndarray:
-        return gradient(param, self.f_cost)
+    def _calculate_update_direction(self, x) -> np.ndarray:
+        return gradient(x, self.f_cost)
 
-    def _find_step_size(self, param, delta):
+    def _find_step_size(self, x, x_delta):
         if self.step_size_max_iter == 0:
             return (self.step_size_lb + self.step_size_ub) / 2
-        f = partial(self._calculate_step_size_cost, param=param, delta=delta)
+        f = partial(self._calculate_step_size_cost, x=x, x_delta=x_delta)
         d_min, d_max = gss(f, self.step_size_lb, self.step_size_ub, max_iter=self.step_size_max_iter)
         return (d_min + d_max) / 2
 
-    def _calculate_step_size_cost(self, step_size, param, delta):
-        param_candidate = param - step_size * delta
-        return self.f_cost(param_candidate)
+    def _calculate_step_size_cost(self, step_size, x, x_delta):
+        x_candidate = x - step_size * x_delta
+        return self.f_cost(x_candidate)

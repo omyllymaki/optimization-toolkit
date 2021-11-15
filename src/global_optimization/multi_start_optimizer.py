@@ -29,7 +29,7 @@ class MultiStartOptimizer:
                  termination_checks: Union[Tuple[Callable], Callable] = TERMINATION_CHECKS):
         """
         @param optimizer: local optimizer used for optimization.
-        @param f_init_guess: Function to generate init guess: init_guess = f_init_guess(params, costs).
+        @param f_init_guess: Function to generate init guess: x0 = f_init_guess(xs, costs).
         @param termination_checks: Function or tuple of functions to check termination.
         """
         self.optimizer = optimizer
@@ -41,28 +41,28 @@ class MultiStartOptimizer:
 
     def run(self):
         min_cost = np.inf
-        output_param = None
+        x_output = None
         output_costs = []
-        output_params = None
+        output_xs = None
         iter_round = 0
         while True:
-            init_guess = self.f_init_guess(output_params, output_costs)
-            param, costs, _ = self.optimizer.run(init_guess)
+            init_guess = self.f_init_guess(output_xs, output_costs)
+            x, costs, _ = self.optimizer.run(init_guess)
             cost = np.min(costs)
             if cost < min_cost:
-                output_param = param
+                x_output = x
             logger.info(f"Round {iter_round}: cost {cost:0.5f}")
 
             output_costs.append(cost)
 
-            if output_params is None:
-                output_params = param
+            if output_xs is None:
+                output_xs = x
             else:
-                output_params = np.vstack((output_params, param))
+                output_xs = np.vstack((output_xs, x))
 
             if check_termination(np.array(output_costs), self.termination_checks):
                 break
 
             iter_round += 1
 
-        return output_param, output_costs, output_params
+        return x_output, output_costs, output_xs

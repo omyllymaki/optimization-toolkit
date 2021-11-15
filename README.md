@@ -23,9 +23,9 @@ pip3 install -r requirements.txt
 
 Given termination criteria and cost function f_cost
 
-cost = f_cost(parameters),
+cost = f_cost(x),
 
-Solve optimal parameters that will minimize the cost, using selected optimization method.
+Find solution x* that will minimize the cost, using selected optimization method.
 
 ## Supported optimization methods
 
@@ -57,11 +57,11 @@ All the methods can be configured flexibly with callbacks.
 ### Minimal minimization problem
 
 ```
-def f_cost(param):
-    return (param[0] - 0.5) ** 2 + (param[1] + 0.5) ** 2
+def f_cost(x):
+    return (x[0] - 0.5) ** 2 + (x[1] + 0.5) ** 2
 
 optimizer = GradientDescent(f_cost=f_cost)
-param, costs, _ = optimizer.run(np.random.randn(2))
+x, costs, _ = optimizer.run(np.random.randn(2))
 ```
 
 ### Minimal model fitting problem

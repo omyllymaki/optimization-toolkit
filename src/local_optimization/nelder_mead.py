@@ -16,16 +16,16 @@ TERMINATION_CHECKS = (
 logger = logging.getLogger(__name__)
 
 
-def generate_init_test_points(param, scale=1):
+def generate_init_test_points(x, scale=1):
     """
-    Generate initial test points around param.
+    Generate initial test points around x.
     """
-    n_dim = len(param)
-    points = param.copy()
+    n_dim = len(x)
+    points = x.copy()
     for k in range(n_dim):
         v = np.random.randn(len(points))
         v = v / np.linalg.norm(v)
-        point = param + scale * v
+        point = x + scale * v
         points = np.vstack((points, point))
     return points
 
@@ -73,7 +73,7 @@ class NelderMead(LocalOptimizer):
         """
 
         @param f_cost: See LocalOptimizer.
-        @param f_points: Function to generate initial test points from init guess: test_points = f_points(init_guess).
+        @param f_points: Function to generate initial test points from init guess: test_points = f_points(x0).
         @param reflection_factor: Step size to generate reflected point.
         @param expansion_factor: Step size to generate expanded point (> 1).
         @param contraction_factor: Step size to generate contracted point (< 1).
@@ -88,11 +88,11 @@ class NelderMead(LocalOptimizer):
         self.shrink_factor = shrink_factor
         self.points = None
 
-    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
+    def update(self, x, iter_round, cost) -> Tuple[np.ndarray, float]:
 
         # At first iteration, generate initial test points
         if self.points is None:
-            self._generate_init_test_points(param)
+            self._generate_init_test_points(x)
 
         # Centroid of test points, worst point not included
         centroid = np.mean(self.points[:-1], axis=0)
@@ -124,8 +124,8 @@ class NelderMead(LocalOptimizer):
 
         return self.points[0], self.point_costs[0]
 
-    def _generate_init_test_points(self, param):
-        self.points = self.f_points(param)
+    def _generate_init_test_points(self, x):
+        self.points = self.f_points(x)
         self.point_costs = np.array([self.f_cost(p) for p in self.points])
         indices = np.argsort(self.point_costs)
         self.points = self.points[indices]

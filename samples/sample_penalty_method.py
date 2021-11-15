@@ -14,38 +14,38 @@ IEQ_CONSTRAINT_PENALTY = 50.0
 
 
 # equality constraint: x2 - x1 + 8 = 0
-def eq_constraint(param):
-    x1, x2 = param
+def eq_constraint(x):
+    x1, x2 = x
     return x2 - x1 + 8
 
 
 # inequality constraint: 2 * x1 + x2 + 4 <= 0
-def ieq_constraint(param):
-    x1, x2 = param
+def ieq_constraint(x):
+    x1, x2 = x
     return 2 * x1 + x2 + 4
 
 
 # unconstrained function to minimize
-def f(param):
+def f(x):
     h = np.array([1, 1, 1, 2]).reshape(2, 2)
     g = np.array([1, 2])
     r = 2
-    return 0.5 * param.T @ h @ param + g.T @ param + r
+    return 0.5 * x.T @ h @ x + g.T @ x + r
 
 
 # constrained function to minimize
-def f_constrained(param, a1, a2):
-    p1 = a1 * eq_constraint(param) ** 2
-    p2 = a2 * max(0.0, ieq_constraint(param)) ** 2
-    return f(param) + p1 + p2
+def f_constrained(x, a1, a2):
+    p1 = a1 * eq_constraint(x) ** 2
+    p2 = a2 * max(0.0, ieq_constraint(x)) ** 2
+    return f(x) + p1 + p2
 
 
 def main():
-    x = np.arange(-10, 10, 0.1)
+    g = np.arange(-10, 10, 0.1)
 
     grid_costs = []
-    for i, x1 in enumerate(x):
-        for j, x2 in enumerate(x):
+    for i, x1 in enumerate(g):
+        for j, x2 in enumerate(g):
             cost = f(np.array([x1, x2]))
             grid_costs.append(cost)
 
@@ -57,17 +57,17 @@ def main():
     init_guess = np.array([5, 5]).astype(float)
     f_cost = partial(f_constrained, a1=EQ_CONSTRAINT_PENALTY, a2=IEQ_CONSTRAINT_PENALTY)
     optimizer = NelderMead(f_cost=f_cost, termination_checks=termination)
-    param, costs, params = optimizer.run(init_guess)
+    x, costs, xs = optimizer.run(init_guess)
 
     plt.subplot(1, 2, 1)
-    xx, yy = np.meshgrid(x, x)
+    xx, yy = np.meshgrid(g, g)
     zz = np.array(grid_costs).reshape(xx.shape)
     plt.pcolormesh(xx, yy, zz ** 0.2)
     plt.colorbar()
-    plt.plot(x, x - 8, "r--")
-    plt.plot(x, -2 * x - 4, "r--")
-    plt.plot(params[:, 0], params[:, 1], "k-")
-    plt.plot(param[0], param[1], "mo", markersize=5)
+    plt.plot(g, g - 8, "r--")
+    plt.plot(g, -2 * g - 4, "r--")
+    plt.plot(xs[:, 0], xs[:, 1], "k-")
+    plt.plot(x[0], x[1], "mo", markersize=5)
 
     plt.subplot(1, 2, 2)
     plt.plot(costs)

@@ -14,14 +14,14 @@ class LocalOptimizer(ABC):
     """
     Base class for local optimization.
 
-    Inheritors need to implement update function that updates parameters that needs to be solved.
+    Inheritors need to implement update function that updates variables x to minimize given cost function f_cost.
     """
 
     def __init__(self,
                  f_cost: Callable,
                  termination_checks: Union[Tuple[Callable], Callable]):
         """
-        @param f_cost: Function to calculate cost: cost = f_cost(param).
+        @param f_cost: Function to calculate cost: cost = f_cost(x).
         @param termination_checks: This if function or tuple of functions that return true if iteration should be
         terminated, otherwise false. All the functions will be checked and iteration is terminated if any of these
         return true.
@@ -31,52 +31,52 @@ class LocalOptimizer(ABC):
             termination_checks = (termination_checks,)
         self.termination_checks = termination_checks
 
-    def run(self, init_guess: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def run(self, x0: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Run optimization.
 
-        @param init_guess: Initial guess for parameters.
+        @param x0: Initial guess for variables.
 
         @return: Tuple containing
-        (final solution for parameters, costs from iteration, list of parameter values from iteration)
+        (final solution, costs from iteration, variables from iteration)
         """
-        param = init_guess.copy()
-        final_param = init_guess.copy()
-        cost = self.f_cost(param)
+        x = x0.copy()
+        final_solution = x0.copy()
+        cost = self.f_cost(x)
         min_cost = cost
         costs = [cost]
-        params = param.copy()
+        xs = x.copy()
         iter_round = 0
         logger.info(f"Init cost: {cost:0.5f}")
         while True:
 
-            param, cost = self.update(param, iter_round, cost)
+            x, cost = self.update(x, iter_round, cost)
             costs.append(cost)
-            params = np.vstack((params, param))
+            xs = np.vstack((xs, x))
             logger.info(f"Round {iter_round}: cost {cost:0.5f}")
             iter_round += 1
 
             if cost < min_cost:
                 min_cost = cost
-                final_param = param.copy()
+                final_solution = x.copy()
 
             if check_termination(np.array(costs), self.termination_checks):
                 break
 
-        return final_param, np.array(costs), params
+        return final_solution, np.array(costs), xs
 
     @abstractmethod
     def update(self,
-               param: np.ndarray,
+               x: np.ndarray,
                iter_round: int,
                cost: float) -> Tuple[np.ndarray, float]:
         """
-        Update parameter that needs to be solved. Inheritors need to implement this.
+        Update variables that needs to be solved. Inheritors need to implement this.
 
-        @param param: Current parameter values.
+        @param x: Current variable values.
         @param iter_round:  Current iteration round.
         @param cost: Current cost.
 
-        @return Tuple containing updated parameters and new cost for updated parameters.
+        @return Tuple containing updated variables and new cost for updated variables.
         """
         raise NotImplementedError

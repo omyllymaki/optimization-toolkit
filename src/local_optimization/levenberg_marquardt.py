@@ -24,8 +24,8 @@ class LevenbergMarquardt(LocalOptimizer):
 
     Levenberg-Marquardt is damped Gauss-Newton method where increment vector is rotated towards the direction of
     steepest descent. Amount of this rotation is determined by damping factor which is changed during iteration.
-    If cost decreases, the parameters are updated and damping factor is decreased, making LMA to work more like
-    standard Gauss-Newton. If cost increases, the parameters are not updated and damping factor is increased,
+    If cost decreases, the variables are updated and damping factor is decreased, making LMA to work more like
+    standard Gauss-Newton. If cost increases, the variables are not updated and damping factor is increased,
     making LMA to work more like gradient descent.
     """
 
@@ -35,7 +35,7 @@ class LevenbergMarquardt(LocalOptimizer):
                  termination_checks=TERMINATION_CHECKS
                  ):
         """
-        @param f_err: Function to calculate errors: errors = f_err(param). cost is then calculated as MSE(errors).
+        @param f_err: Function to calculate errors: errors = f_err(x). cost is then calculated as MSE(errors).
         @param damping_factor_scaling: Scale factor to change damping factor at every iteration (> 1).
         @param termination_checks: See LocalOptimizer.
         """
@@ -45,30 +45,30 @@ class LevenbergMarquardt(LocalOptimizer):
         self.damping_factor = None
         super().__init__(self.f_cost, termination_checks)
 
-    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
-        param_delta = self._calculate_update_delta(param)
-        param_candidate = param - param_delta
-        cost_candidate = self.f_cost(param_candidate)
+    def update(self, x, iter_round, cost) -> Tuple[np.ndarray, float]:
+        x_delta = self._calculate_update_delta(x)
+        x_candidate = x - x_delta
+        cost_candidate = self.f_cost(x_candidate)
         if cost_candidate < cost:
-            param = param_candidate
+            x = x_candidate
             cost = cost_candidate
             self.damping_factor = self.damping_factor / self.damping_factor_scaling
-            logger.debug(f"Cost decreased; decrease damping factor and update parameters")
+            logger.debug(f"Cost decreased; decrease damping factor and update variables")
         else:
             self.damping_factor = self.damping_factor_scaling * self.damping_factor
-            logger.debug(f"Cost increased; increase damping factor and don't update parameters")
+            logger.debug(f"Cost increased; increase damping factor and don't update variables")
         logger.debug(f"Cost {cost:0.3f}; damping factor {self.damping_factor:0.3f}")
 
-        return param, cost
+        return x, cost
 
-    def _calculate_update_delta(self, param) -> np.ndarray:
-        errors = self.f_err(param)
-        jac = gradient(param, self.f_err)
+    def _calculate_update_delta(self, x) -> np.ndarray:
+        errors = self.f_err(x)
+        jac = gradient(x, self.f_err)
         jj = jac.T @ jac
         if self.damping_factor is None:
             self.damping_factor = np.max(np.diag(jj))
         correction = np.diag(self.damping_factor * np.diag(jj))
         return pinv(jj + correction) @ jac.T @ errors
 
-    def f_cost(self, param):
-        return mse(self.f_err(param))
+    def f_cost(self, x):
+        return mse(self.f_err(x))

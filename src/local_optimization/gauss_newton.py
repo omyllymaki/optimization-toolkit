@@ -23,7 +23,7 @@ class GaussNewton(LocalOptimizer):
     """
     Gauss-Newton optimizer.
 
-    Minimize sum(errors^2) by optimizing parameters using Gauss-Newton (GN) method.
+    Minimize sum(errors^2) using Gauss-Newton (GN) method.
 
     Based on parameter choices, this method can be used as classical GN (step_size = 1) or as damped version (step size
     between 0 and 1). This method can also be used for iteratively re-weighted least squares where weights are updated
@@ -31,7 +31,7 @@ class GaussNewton(LocalOptimizer):
 
     Note that Gauss-Newton optimizer takes f_err instead of f_cost as input. f_cost is then implicitly defined as
 
-    f_cost = MSE(f_err(param))
+    f_cost = MSE(f_err(x))
     """
 
     def __init__(self,
@@ -43,11 +43,10 @@ class GaussNewton(LocalOptimizer):
                  termination_checks=TERMINATION_CHECKS
                  ):
         """
-        @param f_err: Function to calculate errors: errors = f_err(param). cost is then calculated as MSE(errors).
+        @param f_err: Function to calculate errors: errors = f_err(x). cost is then calculated as MSE(errors).
         @param f_weights: Function to calculate weights for LS fit: weights = f_weights(errors)
         @param step_size_max_iter: Number of iterations for optimal step size search.
         @param step_size_lb: lower bound for step size.
-        @param step_size_ub: Upper bound for step size.
         @param step_size_ub: Upper bound for step size.
         @param termination_checks: See LocalOptimizer.
         """
@@ -59,41 +58,41 @@ class GaussNewton(LocalOptimizer):
         self.weights = None
         super().__init__(self.f_cost, termination_checks)
 
-    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
-        param_delta = self._calculate_update_direction(param)
-        step_size = self._find_step_size(param, param_delta)
-        param = param - step_size * param_delta
-        cost = self.f_cost(param)
+    def update(self, x, iter_round, cost) -> Tuple[np.ndarray, float]:
+        x_delta = self._calculate_update_direction(x)
+        step_size = self._find_step_size(x, x_delta)
+        x = x - step_size * x_delta
+        cost = self.f_cost(x)
         logger.debug(f"Cost {cost:0.3f}, step size {step_size:0.3f}")
 
         if self.f_weights is not None:
-            errors = self.f_err(param)
+            errors = self.f_err(x)
             self.weights = self.f_weights(errors)
 
-        return param, cost
+        return x, cost
 
-    def _calculate_update_direction(self, param) -> np.ndarray:
-        errors = self.f_err(param)
-        jac = gradient(param, self.f_err)
+    def _calculate_update_direction(self, x) -> np.ndarray:
+        errors = self.f_err(x)
+        jac = gradient(x, self.f_err)
         if self.weights is None:
             return pinv(jac.T @ jac) @ jac.T @ errors
         else:
             w = np.diag(self.weights)
             return pinv(jac.T @ w @ jac) @ jac.T @ w @ errors
 
-    def _find_step_size(self, param, delta):
+    def _find_step_size(self, x, x_delta):
         if self.step_size_max_iter == 0:
             return (self.step_size_lb + self.step_size_ub) / 2
-        f = partial(self._calculate_step_size_cost, param=param, delta=delta)
+        f = partial(self._calculate_step_size_cost, x=x, x_delta=x_delta)
         d_min, d_max = gss(f, self.step_size_lb, self.step_size_ub, max_iter=self.step_size_max_iter)
         return (d_min + d_max) / 2
 
-    def _calculate_step_size_cost(self, step_size, param, delta):
-        param_candidate = param - step_size * delta
-        return self.f_cost(param_candidate)
+    def _calculate_step_size_cost(self, step_size, x, x_delta):
+        x_candidate = x - step_size * x_delta
+        return self.f_cost(x_candidate)
 
-    def f_cost(self, param):
+    def f_cost(self, x):
         if self.weights is None:
-            return mse(self.f_err(param))
+            return mse(self.f_err(x))
         else:
-            return mse(self.weights * self.f_err(param))
+            return mse(self.weights * self.f_err(x))

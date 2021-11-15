@@ -12,7 +12,7 @@ def gradient(x0: np.ndarray,
     """
     y0 = f(x0)
     output = []
-    for i, parameter in enumerate(x0):
+    for i in range(len(x0)):
         xi = x0.copy()
         xi[i] += step
         yi = f(xi)

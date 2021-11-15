@@ -15,13 +15,13 @@ logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
 
 
-def f_update(param, k):
+def f_update(x, k):
     scaling_factors = 0.995 ** k * np.array([0.2, 0.2])
-    return param + scaling_factors * np.random.randn(param.shape[0])
+    return x + scaling_factors * np.random.randn(x.shape[0])
 
 
-def f_cost(param, a=1, b=10):
-    return (a - param[0]) ** 2 + b * (param[1] - param[0] ** 2) ** 2
+def f_cost(x, a=1, b=10):
+    return (a - x[0]) ** 2 + b * (x[1] - x[0] ** 2) ** 2
 
 
 def f_step(iter_round, max_iter=10000):
@@ -33,10 +33,10 @@ def f_step(iter_round, max_iter=10000):
 
 # This is needed for Gauss-newton
 # Here we define f_err so that f_cost = mse(f_err) = sum(f_err^2)
-# In practice, f_cost = 0.5*(e1^2 + e2^2) = (a - param[0])^2 + b*(param[1] - param[0]^2)^2
-def f_err(param, a=1, b=100):
-    e1 = a - param[0]
-    e2 = np.sqrt(b) * (param[1] - param[0] ** 2)
+# In practice, f_cost = 0.5*(e1^2 + e2^2) = (a - x[0])^2 + b*(x[1] - x[0]^2)^2
+def f_err(x, a=1, b=100):
+    e1 = a - x[0]
+    e2 = np.sqrt(b) * (x[1] - x[0] ** 2)
     return np.sqrt(2) * np.array([e1, e2])
 
 
@@ -73,10 +73,10 @@ def main():
     plt.colorbar()
 
     for name, (optimizer, color) in optimizers.items():
-        param, costs, params = optimizer.run(init_guess)
+        x, costs, xs = optimizer.run(init_guess)
         plt.subplot(1, 2, 1)
-        plt.plot(params[:, 0], params[:, 1], label=name, color=color)
-        plt.plot(params[-1, 0], params[-1, 1], color=color, marker="x")
+        plt.plot(xs[:, 0], xs[:, 1], label=name, color=color)
+        plt.plot(xs[-1, 0], xs[-1, 1], color=color, marker="x")
         plt.legend()
 
         plt.subplot(1, 2, 2)

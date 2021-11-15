@@ -17,8 +17,8 @@ class RandomOptimization(LocalOptimizer):
     """
     Random optimization optimizer.
 
-    Create new parameter values candidate by adding a normally distributed random vector to the current parameter
-    values. Update the current parameter values if cost of candidate is smaller than the current cost.
+    Create new varibales candidate by adding a normally distributed random vector to the current variable
+    values. Update the current variable values if cost of candidate is smaller than the current cost.
     """
 
     def __init__(self,
@@ -27,21 +27,21 @@ class RandomOptimization(LocalOptimizer):
                  termination_checks=TERMINATION_CHECKS,
                  ):
         """
-        @param f_scaling: Function to scaling of parameter update: scale_factors = f_scaling(iter_round)
+        @param f_scaling: Function to calculate scaling for variables update: scale_factors = f_scaling(iter_round)
         @param f_cost: see LocalOptimizer.
         @param termination_checks: See LocalOptimizer.
         """
         super().__init__(f_cost, termination_checks)
         self.f_scaling = f_scaling
 
-    def update(self, param, iter_round, cost) -> Tuple[np.ndarray, float]:
+    def update(self, x, iter_round, cost) -> Tuple[np.ndarray, float]:
         scale_factors = self.f_scaling(iter_round)
-        param_candidate = param + scale_factors * np.random.randn(param.shape[0])
-        candidate_cost = self.f_cost(param_candidate)
+        x_candidate = x + scale_factors * np.random.randn(x.shape[0])
+        candidate_cost = self.f_cost(x_candidate)
         if candidate_cost < cost:
-            param_out = param_candidate
+            x_out = x_candidate
             cost_out = candidate_cost
         else:
-            param_out = param
+            x_out = x
             cost_out = cost
-        return param_out, cost_out
+        return x_out, cost_out
