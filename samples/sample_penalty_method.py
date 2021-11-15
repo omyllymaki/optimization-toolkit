@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 
 from src.local_optimization.nelder_mead import NelderMead
 from src.termination import check_n_iter, check_n_iter_without_improvement
+from src.utils import add_eq_constraint, add_ieq_constraint
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,13 +34,6 @@ def f(x):
     return 0.5 * x.T @ h @ x + g.T @ x + r
 
 
-# constrained function to minimize
-def f_constrained(x, a1, a2):
-    p1 = a1 * eq_constraint(x) ** 2
-    p2 = a2 * max(0.0, ieq_constraint(x)) ** 2
-    return f(x) + p1 + p2
-
-
 def main():
     g = np.arange(-10, 10, 0.1)
 
@@ -55,7 +49,9 @@ def main():
     )
 
     init_guess = np.array([5, 5]).astype(float)
-    f_cost = partial(f_constrained, a1=EQ_CONSTRAINT_PENALTY, a2=IEQ_CONSTRAINT_PENALTY)
+    f_cost = f
+    f_cost = add_eq_constraint(f_cost, eq_constraint, penalty_parameter=EQ_CONSTRAINT_PENALTY)
+    f_cost = add_ieq_constraint(f_cost, ieq_constraint, penalty_parameter=IEQ_CONSTRAINT_PENALTY)
     optimizer = NelderMead(f_cost=f_cost, termination_checks=termination)
     x, costs, xs = optimizer.run(init_guess)
 
@@ -64,10 +60,11 @@ def main():
     zz = np.array(grid_costs).reshape(xx.shape)
     plt.pcolormesh(xx, yy, zz ** 0.2)
     plt.colorbar()
-    plt.plot(g, g - 8, "r--")
-    plt.plot(g, -2 * g - 4, "r--")
+    plt.plot(g, g - 8, "r--", label="Equality constraint")
+    plt.plot(g, -2 * g - 4, "g--", label="Inequality constraint")
     plt.plot(xs[:, 0], xs[:, 1], "k-")
     plt.plot(x[0], x[1], "mo", markersize=5)
+    plt.legend()
 
     plt.subplot(1, 2, 2)
     plt.plot(costs)
