@@ -40,25 +40,25 @@ def mse(errors):
     return np.mean(errors ** 2)
 
 
-def add_eq_constraint(func: Callable, constrain: Callable, penalty_parameter=1e6):
+def eq_constraint_penalty(f_constraint: Callable, x: np.ndarray, penalty_parameter=1e6):
     """
-    Add soft equality constrain to function func.
+    Calculate soft equality constraint penalty.
 
-    @param func: Original function.
-    @param constrain: constrain that should be satisfied; constrain(x) = 0.
+    @param f_constraint: constraint that should be satisfied; constrain(x) = 0.
+    @param x: variables
     @param penalty_parameter: penalty parameter.
-    @return: Original function that is augmented with soft equality constrain.
+    @return: penalty.
     """
-    return lambda x: func(x) + penalty_parameter * constrain(x) ** 2
+    return penalty_parameter * f_constraint(x) ** 2
 
 
-def add_ieq_constraint(func: Callable, constrain: Callable, penalty_parameter=1e6):
+def ieq_constraint_penalty(f_constraint: Callable, x: np.ndarray, penalty_parameter=1e6):
     """
-    Add soft inequality constrain to function func.
+    Calculate soft inequality constraint penalty.
 
-    @param func: Original function.
-    @param constrain: constrain that should be satisfied; constrain(x) <= 0.
+    @param f_constraint: inequality constraint that should be satisfied; f_constraint(x) <= 0.
+    @param x: variables
     @param penalty_parameter: penalty parameter.
-    @return: Original function that is augmented with soft inequality constrain.
+    @return: penalty.
     """
-    return lambda x: func(x) + penalty_parameter * max(0, constrain(x)) ** 2
+    return penalty_parameter * max(0, f_constraint(x)) ** 2

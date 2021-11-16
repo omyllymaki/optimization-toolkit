@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from src.local_optimization.nelder_mead import NelderMead
 from src.termination import check_n_iter, check_n_iter_without_improvement
-from src.utils import add_eq_constraint, add_ieq_constraint
+from src.utils import eq_constraint_penalty, ieq_constraint_penalty
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,11 +27,19 @@ def ieq_constraint(x):
 
 
 # unconstrained function to minimize
-def f(x):
+def f_cost(x):
     h = np.array([1, 1, 1, 2]).reshape(2, 2)
     g = np.array([1, 2])
     r = 2
     return 0.5 * x.T @ h @ x + g.T @ x + r
+
+
+# constrained function to minimize
+def f_cost_constrained(x):
+    f = f_cost(x)
+    p1 = eq_constraint_penalty(eq_constraint, x, EQ_CONSTRAINT_PENALTY)
+    p2 = ieq_constraint_penalty(ieq_constraint, x, IEQ_CONSTRAINT_PENALTY)
+    return f + p1 + p2
 
 
 def main():
@@ -40,7 +48,7 @@ def main():
     grid_costs = []
     for i, x1 in enumerate(g):
         for j, x2 in enumerate(g):
-            cost = f(np.array([x1, x2]))
+            cost = f_cost(np.array([x1, x2]))
             grid_costs.append(cost)
 
     termination = (
@@ -49,10 +57,7 @@ def main():
     )
 
     init_guess = np.array([5, 5]).astype(float)
-    f_cost = f
-    f_cost = add_eq_constraint(f_cost, eq_constraint, penalty_parameter=EQ_CONSTRAINT_PENALTY)
-    f_cost = add_ieq_constraint(f_cost, ieq_constraint, penalty_parameter=IEQ_CONSTRAINT_PENALTY)
-    optimizer = NelderMead(f_cost=f_cost, termination_checks=termination)
+    optimizer = NelderMead(f_cost=f_cost_constrained, termination_checks=termination)
     x, costs, xs = optimizer.run(init_guess)
 
     plt.subplot(1, 2, 1)
