@@ -16,16 +16,16 @@ TERMINATION_CHECKS = (
 logger = logging.getLogger(__name__)
 
 
-def generate_init_test_points(x, scale=1):
+def generate_init_test_points(x, scalers=1):
     """
     Generate initial test points around x.
     """
     n_dim = len(x)
     points = x.copy()
     for k in range(n_dim):
-        v = np.random.randn(len(points))
+        v = np.random.randn(n_dim)
         v = v / np.linalg.norm(v)
-        point = x + scale * v
+        point = x + scalers * v
         points = np.vstack((points, point))
     return points
 
