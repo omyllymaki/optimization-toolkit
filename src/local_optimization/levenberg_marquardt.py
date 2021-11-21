@@ -4,7 +4,6 @@ from typing import Tuple, Callable
 
 import numpy as np
 from numpy.linalg import pinv
-
 from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
 from src.utils import gradient, mse
@@ -31,17 +30,20 @@ class LevenbergMarquardt(LocalOptimizer):
 
     def __init__(self,
                  f_err: Callable,
-                 damping_factor_scaling=2.0,
+                 damping_increase_factor=2.0,
+                 damping_decrease_factor=2.0,
                  termination_checks=TERMINATION_CHECKS
                  ):
         """
         @param f_err: Function to calculate errors: errors = f_err(x). cost is then calculated as MSE(errors).
-        @param damping_factor_scaling: Scale factor to change damping factor at every iteration (> 1).
+        @param damping_increase_factor: Scale factor to increase damping factor (> 1).
+        @param damping_decrease_factor: Scale factor to decrease damping factor (> 1).
         @param termination_checks: See LocalOptimizer.
         """
         self.f_err = f_err
         self.weights = None
-        self.damping_factor_scaling = damping_factor_scaling
+        self.damping_increase_factor = damping_increase_factor
+        self.damping_decrease_factor = damping_decrease_factor
         self.damping_factor = None
         super().__init__(self.f_cost, termination_checks)
 
@@ -52,10 +54,10 @@ class LevenbergMarquardt(LocalOptimizer):
         if cost_candidate < cost:
             x = x_candidate
             cost = cost_candidate
-            self.damping_factor = self.damping_factor / self.damping_factor_scaling
+            self.damping_factor = self.damping_factor / self.damping_decrease_factor
             logger.debug(f"Cost decreased; decrease damping factor and update variables")
         else:
-            self.damping_factor = self.damping_factor_scaling * self.damping_factor
+            self.damping_factor = self.damping_increase_factor * self.damping_factor
             logger.debug(f"Cost increased; increase damping factor and don't update variables")
         logger.debug(f"Cost {cost:0.3f}; damping factor {self.damping_factor:0.3f}")
 
