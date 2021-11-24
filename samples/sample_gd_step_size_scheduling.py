@@ -46,8 +46,8 @@ def main():
     optimizer = GradientDescent(f_cost=partial(f_cost, x=x, y=y_noisy),
                                 termination_checks=termination_checks,
                                 f_step=partial(f_step, max_iter=max_iter))
-    param, costs, _ = optimizer.run(init_guess)
-    y_estimate = f_eval(x, param)
+    output = optimizer.run(init_guess)
+    y_estimate = f_eval(x, output.x)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="Original, noiseless signal", linewidth=1.5)
@@ -57,7 +57,7 @@ def main():
     plt.ylabel("Y")
     plt.legend()
     plt.subplot(1, 2, 2)
-    plt.plot(costs, "-o")
+    plt.plot(output.costs, "-o")
     plt.yscale("log")
     plt.show()
 

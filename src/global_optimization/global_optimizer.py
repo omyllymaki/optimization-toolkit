@@ -1,8 +1,7 @@
 import logging
 from abc import ABC
-from typing import Tuple
 
-import numpy as np
+from src.optimization_results import Output
 
 logger = logging.getLogger(__name__)
 
@@ -14,11 +13,10 @@ class GlobalOptimizer(ABC):
     Inheritors need to implement run function.
     """
 
-    def run(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def run(self) -> Output:
         """
         Run global optimization.
 
-        @return: Tuple containing
-        (final solution, costs from iteration, variable values from iteration)
+        @return: optimization results.
         """
         raise NotImplementedError

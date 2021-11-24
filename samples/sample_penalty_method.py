@@ -58,7 +58,7 @@ def main():
 
     init_guess = np.array([5, 5]).astype(float)
     optimizer = NelderMead(f_cost=f_cost_constrained, termination_checks=termination)
-    x, costs, xs = optimizer.run(init_guess)
+    output = optimizer.run(init_guess)
 
     plt.subplot(1, 2, 1)
     xx, yy = np.meshgrid(g, g)
@@ -67,12 +67,12 @@ def main():
     plt.colorbar()
     plt.plot(g, g - 8, "r--", label="Equality constraint")
     plt.plot(g, -2 * g - 4, "g--", label="Inequality constraint")
-    plt.plot(xs[:, 0], xs[:, 1], "k-")
-    plt.plot(x[0], x[1], "mo", markersize=5)
+    plt.plot(output.xs[:, 0], output.xs[:, 1], "k-")
+    plt.plot(output.x[0], output.x[1], "mo", markersize=5)
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(costs)
+    plt.plot(output.costs)
     plt.yscale("log")
 
     plt.show()

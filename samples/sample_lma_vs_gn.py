@@ -34,11 +34,11 @@ def main():
     gn = GaussNewton(partial(f_err, x=x, y=y_noisy), step_size_max_iter=10)
     lma = LevenbergMarquardt(partial(f_err, x=x, y=y_noisy))
 
-    param_gn, costs_gn, _ = gn.run(init_guess)
-    param_lma, costs_lma, _ = lma.run(init_guess)
+    output_gn = gn.run(init_guess)
+    output_lma = lma.run(init_guess)
 
-    y_estimate_gn = f_eval(x, param_gn)
-    y_estimate_lma = f_eval(x, param_lma)
+    y_estimate_gn = f_eval(x, output_gn.x)
+    y_estimate_lma = f_eval(x, output_lma.x)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y_noisy, "b-", label="Noisy input data")
@@ -47,8 +47,8 @@ def main():
     plt.legend()
     plt.title("Input data & fitted models")
     plt.subplot(1, 2, 2)
-    plt.plot(costs_gn, "g-", label="GN")
-    plt.plot(costs_lma, "r-", label="LMA")
+    plt.plot(output_gn.costs, "g-", label="GN")
+    plt.plot(output_lma.costs, "r-", label="LMA")
     plt.legend()
     plt.title("Costs")
     plt.show()

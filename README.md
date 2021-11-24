@@ -61,7 +61,7 @@ def f_cost(x):
     return (x[0] - 0.5) ** 2 + (x[1] + 0.5) ** 2
 
 optimizer = GradientDescent(f_cost=f_cost)
-x, costs, _ = optimizer.run(np.random.randn(2))
+output = optimizer.run(np.random.randn(2))
 ```
 
 ### Minimal model fitting problem
@@ -78,9 +78,8 @@ def f_cost(param, x, y):
 x = np.arange(1, 100)
 param_true = np.array([1.0, 2.5])
 y = f_eval(x, param_true)
-f_step = lambda k: (0, 1e-3)
-optimizer = GradientDescent(f_cost=partial(f_cost, x=x, y=y), f_step=f_step)
-param, costs, _ = optimizer.run(np.random.randn(2))
+optimizer = GradientDescent(f_cost=partial(f_cost, x=x, y=y))
+output = optimizer.run(np.random.randn(2))
 ```
 
 ### Samples

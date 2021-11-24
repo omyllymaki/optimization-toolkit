@@ -6,6 +6,7 @@ from typing import Tuple, Union
 import numpy as np
 
 from src.local_optimization.local_optimizer import LocalOptimizer
+from src.optimization_results import Output
 from src.termination import check_n_iter, check_n_iter_without_improvement, check_absolute_cost, check_termination
 
 logger = logging.getLogger(__name__)
@@ -42,27 +43,32 @@ class MultiStartOptimizer:
     def run(self):
         min_cost = np.inf
         x_output = None
-        output_costs = []
+        output_costs = np.array([])
         output_xs = None
         iter_round = 0
         while True:
             init_guess = self.f_init_guess(output_xs, output_costs)
-            x, costs, _ = self.optimizer.run(init_guess)
-            cost = np.min(costs)
-            if cost < min_cost:
-                x_output = x
-            logger.info(f"Round {iter_round}: cost {cost:0.5f}")
+            o = self.optimizer.run(init_guess)
+            if o.min_cost < min_cost:
+                x_output = o.x
+                min_cost = o.min_cost
+            logger.info(f"Round {iter_round}: cost {o.min_cost:0.5f}")
 
-            output_costs.append(cost)
+            output_costs = np.append(output_costs, o.min_cost)
 
             if output_xs is None:
-                output_xs = x
+                output_xs = o.x
             else:
-                output_xs = np.vstack((output_xs, x))
+                output_xs = np.vstack((output_xs, o.x))
 
-            if check_termination(np.array(output_costs), self.termination_checks):
+            if check_termination(output_costs, self.termination_checks):
                 break
 
             iter_round += 1
 
-        return x_output, output_costs, output_xs
+        output = Output()
+        output.x = x_output
+        output.min_cost = min_cost
+        output.xs = output_xs
+        output.costs = output_costs
+        return output

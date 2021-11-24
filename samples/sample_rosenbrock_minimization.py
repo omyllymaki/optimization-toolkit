@@ -73,14 +73,14 @@ def main():
     plt.colorbar()
 
     for name, (optimizer, color) in optimizers.items():
-        x, costs, xs = optimizer.run(init_guess)
+        output = optimizer.run(init_guess)
         plt.subplot(1, 2, 1)
-        plt.plot(xs[:, 0], xs[:, 1], label=name, color=color)
-        plt.plot(xs[-1, 0], xs[-1, 1], color=color, marker="x")
+        plt.plot(output.xs[:, 0], output.xs[:, 1], label=name, color=color)
+        plt.plot(output.xs[-1, 0], output.xs[-1, 1], color=color, marker="x")
         plt.legend()
 
         plt.subplot(1, 2, 2)
-        plt.plot(costs, "-", label=name, color=color)
+        plt.plot(output.costs, "-", label=name, color=color)
         plt.yscale("log")
         plt.xscale("log")
         plt.legend()

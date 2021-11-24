@@ -5,6 +5,7 @@ from typing import Tuple, Callable, Union
 
 import numpy as np
 
+from src.optimization_results import Output
 from src.termination import check_termination
 
 logger = logging.getLogger(__name__)
@@ -31,27 +32,26 @@ class LocalOptimizer(ABC):
             termination_checks = (termination_checks,)
         self.termination_checks = termination_checks
 
-    def run(self, x0: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def run(self, x0: np.ndarray) -> Output:
         """
         Run optimization.
 
         @param x0: Initial guess for variables.
 
-        @return: Tuple containing
-        (final solution, costs from iteration, variables from iteration)
+        @return: optimization results.
         """
         x = x0.copy()
         final_solution = x0.copy()
         cost = self.f_cost(x)
         min_cost = cost
-        costs = [cost]
+        costs = np.array([cost])
         xs = x.copy()
         iter_round = 0
         logger.info(f"Init cost: {cost:0.5f}")
-        while True:
 
+        while True:
             x, cost = self.update(x, iter_round, cost)
-            costs.append(cost)
+            costs = np.append(costs, cost)
             xs = np.vstack((xs, x))
             logger.info(f"Round {iter_round}: cost {cost:0.5f}")
             iter_round += 1
@@ -60,10 +60,15 @@ class LocalOptimizer(ABC):
                 min_cost = cost
                 final_solution = x.copy()
 
-            if check_termination(np.array(costs), self.termination_checks):
+            if check_termination(costs, self.termination_checks):
                 break
 
-        return final_solution, np.array(costs), xs
+        output = Output()
+        output.x = final_solution
+        output.min_cost = min_cost
+        output.xs = xs
+        output.costs = costs
+        return output
 
     @abstractmethod
     def update(self,

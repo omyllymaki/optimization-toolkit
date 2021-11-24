@@ -13,9 +13,9 @@ def f_cost(x):
 
 def main():
     optimizer = GradientDescent(f_cost=f_cost)
-    x, costs, _ = optimizer.run(np.random.randn(2))
-    print(f"Param: {x}")
-    print(f"Cost: {np.min(costs)}")
+    output = optimizer.run(np.random.randn(2))
+    print(f"Param: {output.x}")
+    print(f"Cost: {output.min_cost}")
 
 
 if __name__ == "__main__":

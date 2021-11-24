@@ -26,9 +26,9 @@ def main():
     y = f_eval(x, param_true)
     f_step = lambda k: (0, 1e-3)
     optimizer = GradientDescent(f_cost=partial(f_cost, x=x, y=y), f_step=f_step)
-    param, costs, _ = optimizer.run(np.random.randn(2))
-    print(f"Param: {param}")
-    print(f"Cost: {np.min(costs)}")
+    output = optimizer.run(np.random.randn(2))
+    print(f"Param: {output.x}")
+    print(f"Cost: {output.min_cost}")
 
 
 if __name__ == "__main__":

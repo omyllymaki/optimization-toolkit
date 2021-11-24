@@ -48,15 +48,15 @@ def main():
                                        termination_checks=termination_checks,
                                        f_step=f_step,
                                        step_size_max_iter=10)
-    param_robust, costs_robust, _ = optimizer_robust.run(init_guess)
-    y_estimate_robust = f_eval(x, param_robust)
+    output_robust = optimizer_robust.run(init_guess)
+    y_estimate_robust = f_eval(x, output_robust.x)
 
     optimizer = GradientDescent(f_cost=partial(trimmed_cost, x=x, y=y_noisy, threshold=100),
                                 termination_checks=termination_checks,
                                 f_step=f_step,
                                 step_size_max_iter=10)
-    param, costs, _ = optimizer.run(init_guess)
-    y_estimate = f_eval(x, param)
+    output = optimizer.run(init_guess)
+    y_estimate = f_eval(x, output.x)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="Original, noiseless signal", linewidth=1.5)
@@ -67,8 +67,8 @@ def main():
     plt.ylabel("Y")
     plt.legend()
     plt.subplot(1, 2, 2)
-    plt.plot(costs_robust, "r-", label="Robust fit")
-    plt.plot(costs, "g-", label="Normal fit")
+    plt.plot(output_robust.costs, "r-", label="Robust fit")
+    plt.plot(output.costs, "g-", label="Normal fit")
     plt.yscale("log")
     plt.legend()
     plt.show()

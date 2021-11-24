@@ -56,15 +56,15 @@ def main():
                                    f_weights=partial(f_weights, p=1.0, eps=1e-6),
                                    step_size_max_iter=0,
                                    termination_checks=termination_checks)
-    param_robust, costs_robust, _ = optimizer_robust.run(init_guess)
-    y_estimate_robust = f_eval(x, param_robust)
+    output_robust = optimizer_robust.run(init_guess)
+    y_estimate_robust = f_eval(x, output_robust.x)
 
     optimizer = GaussNewton(f_err=partial(f_err, x=x, y=y_noisy),
                             f_weights=None,
                             step_size_max_iter=0,
                             termination_checks=termination_checks)
-    param, costs, _ = optimizer.run(init_guess)
-    y_estimate = f_eval(x, param)
+    output = optimizer.run(init_guess)
+    y_estimate = f_eval(x, output.x)
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y, "b-", label="True", linewidth=2.0)
@@ -75,8 +75,8 @@ def main():
     plt.ylabel("Y")
     plt.legend()
     plt.subplot(1, 2, 2)
-    plt.plot(costs, "g-", label="Normal Fit", linewidth=2.0)
-    plt.plot(costs_robust, "r-", label="Robust Fit", linewidth=2.0)
+    plt.plot(output.costs, "g-", label="Normal Fit", linewidth=2.0)
+    plt.plot(output_robust.costs, "r-", label="Robust Fit", linewidth=2.0)
     plt.legend()
     plt.show()
 

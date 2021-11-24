@@ -66,15 +66,15 @@ def main():
         fe = partial(f_err, source=source, target=target)
         optimizer = LevenbergMarquardt(f_err=fe, termination_checks=termination_checks)
         t1 = time.time()
-        param, costs, _ = optimizer.run(init_guess)
+        output = optimizer.run(init_guess)
         t2 = time.time()
         duration_ms = 1000 * (t2 - t1)
-        t = coeff_to_transform_matrix(param)
+        t = coeff_to_transform_matrix(output.x)
         source_transformed = transform(t, source)
 
         print(f"Test {k}")
         print(f"True param: {param_true}")
-        print(f"Estimated param: {param}")
+        print(f"Estimated param: {output.x}")
 
         distances = calculate_distances(source_transformed, target)
         mean_distance = np.mean(distances)
@@ -92,7 +92,7 @@ def main():
 
         plt.subplot(2, 1, 2)
         plt.cla()
-        plt.plot(costs, "-o")
+        plt.plot(output.costs, "-o")
 
         plt.figure(2)
         plt.subplot(3, 3, k + 1)

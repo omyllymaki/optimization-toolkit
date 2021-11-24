@@ -34,13 +34,13 @@ def main():
     local_optimizer = GaussNewton(partial(f_err, x=x, y=y_noisy), step_size_max_iter=5)
     global_optimizer = MultiStartOptimizer(optimizer=local_optimizer, f_init_guess=f_init_guess)
 
-    best_param, costs, all_params = global_optimizer.run()
-    i_min = np.argmin(costs)
-    i_max = np.argmax(costs)
+    output = global_optimizer.run()
+    i_min = np.argmin(output.costs)
+    i_max = np.argmax(output.costs)
 
-    y_estimate = f_eval(x, all_params[0])
-    y_estimate_best = f_eval(x, all_params[i_min])
-    y_estimate_worst = f_eval(x, all_params[i_max])
+    y_estimate = f_eval(x, output.xs[0])
+    y_estimate_best = f_eval(x, output.xs[i_min])
+    y_estimate_worst = f_eval(x, output.xs[i_max])
 
     plt.subplot(1, 2, 1)
     plt.plot(x, y_noisy, "b-", label="Noisy input data")
@@ -50,7 +50,7 @@ def main():
     plt.legend()
     plt.title("Input data & fitted models")
     plt.subplot(1, 2, 2)
-    plt.plot(costs)
+    plt.plot(output.costs)
     plt.title("Final cost for different init guesses")
     plt.show()
 
