@@ -8,12 +8,11 @@ from scipy.spatial.transform import Rotation as R
 
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 from src.termination import check_n_iter, check_absolute_cost_diff
-from src.utils import mse
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
 
-NOISE = 0.05
+NOISE = 0.00
 
 
 def coeff_to_transform_matrix(coeff):
@@ -48,15 +47,9 @@ def calculate_distances(source, target):
     return np.linalg.norm(diff, axis=1)
 
 
-def f_cost(param, source, target):
-    source_transformed = f_eval(source, param)
-    errors = calculate_distances(source_transformed, target)
-    return mse(errors)
-
-
 def f_err(param, source, target):
     source_transformed = f_eval(source, param)
-    return calculate_distances(source_transformed, target)
+    return (source_transformed - target).reshape(-1)
 
 
 def main():
