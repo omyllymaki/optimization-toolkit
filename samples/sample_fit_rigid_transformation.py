@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
 
 NOISE = 0.00
+N_OUTLIERS = 10
 
 
 def coeff_to_transform_matrix(coeff):
@@ -47,23 +48,43 @@ def calculate_distances(source, target):
     return np.linalg.norm(diff, axis=1)
 
 
-def f_err(param, source, target):
+def linear(errors):
+    return errors
+
+
+def soft_l1(errors, eps=0):
+    abs_errors = abs(errors)
+    abs_errors[abs_errors < eps] = eps
+    rho = 2 * ((1 + abs_errors) ** 0.5 - 1)
+    return rho
+
+
+def cauchy(errors, eps=0):
+    abs_errors = abs(errors)
+    abs_errors[abs_errors < eps] = eps
+    return np.log(1 + abs_errors)
+
+
+def f_err(param, source, target, loss=soft_l1):
     source_transformed = f_eval(source, param)
-    return (source_transformed - target).reshape(-1)
+    diff = (source_transformed - target).reshape(-1)
+    return loss(diff)
 
 
 def main():
     for k in range(9):
         source = np.random.randn(50, 3)
-        param_true = np.random.randn(6)
+        param_true = np.array([0, 0, 0.5, 5, 6, 0])
         target = f_eval(source, param_true) + NOISE * np.random.randn(50, 3)
+
+        target[:N_OUTLIERS] = target[:N_OUTLIERS] + np.array([5, 5, 0])
 
         init_guess = np.zeros(6)
         termination_checks = (
             partial(check_n_iter, threshold=500),
             partial(check_absolute_cost_diff, threshold=1e-9)
         )
-        fe = partial(f_err, source=source, target=target)
+        fe = partial(f_err, source=source, target=target, loss=cauchy)
         optimizer = LevenbergMarquardt(f_err=fe, termination_checks=termination_checks)
         t1 = time.time()
         output = optimizer.run(init_guess)
@@ -73,11 +94,11 @@ def main():
         source_transformed = transform(t, source)
 
         print(f"Test {k}")
-        print(f"True param: {param_true}")
-        print(f"Estimated param: {output.x}")
+        print(f"True param: {np.array_str(param_true, precision=2, suppress_small=True)}")
+        print(f"Estimated param: {np.array_str(output.x, precision=2, suppress_small=True)}")
 
         distances = calculate_distances(source_transformed, target)
-        mean_distance = np.mean(distances)
+        mean_distance = np.mean(distances[N_OUTLIERS:])
 
         plt.figure(1)
         plt.subplot(2, 2, 1)
