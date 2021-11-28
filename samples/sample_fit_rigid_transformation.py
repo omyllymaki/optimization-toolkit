@@ -8,7 +8,7 @@ from scipy.spatial.transform import Rotation as R
 
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 from src.termination import check_n_iter, check_absolute_cost_diff
-from src.utils import generalized_robust_kernel
+from src.utils import generalized_robust_loss
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
@@ -52,7 +52,7 @@ def calculate_distances(source, target):
 def f_err(param, source, target, loss_alpha=1.0, loss_scale=1.0):
     source_transformed = f_eval(source, param)
     diff = (source_transformed - target).reshape(-1)
-    return generalized_robust_kernel(diff, alpha=loss_alpha, scale=loss_scale)
+    return generalized_robust_loss(diff, alpha=loss_alpha, scale=loss_scale)
 
 
 def main():
