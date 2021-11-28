@@ -55,7 +55,7 @@ def main():
     init_guess = np.zeros(3)
     termination_checks = partial(check_n_iter, threshold=50)
 
-    alphas = [2, 1.5, 1, 0.1, -1]
+    alphas = [2, 1.5, 1, 0, -1]
     for alpha in alphas:
         fe = partial(f_err, x=x, y=y_noisy, loss_scale=1.0, loss_alpha=alpha)
         optimizer = LevenbergMarquardt(f_err=fe, termination_checks=termination_checks)

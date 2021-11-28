@@ -75,12 +75,13 @@ def generalized_robust_kernel(errors: np.ndarray, alpha: float, scale: float) ->
     """
     if alpha >= 2:
         return errors
-    if alpha == 0:
-        raise Exception("Generalized robust kernel is not defined when alpha=0")
     scaled_abs_errors = abs(errors) / scale
-    t1 = np.abs(alpha - 2) / alpha
-    t2 = (scaled_abs_errors / abs(alpha - 2) + 1) ** (alpha / 2) - 1
-    out = t1 * t2
+    if alpha == 0:
+        out = np.log(scaled_abs_errors / 2 + 1)
+    else:
+        t1 = np.abs(alpha - 2) / alpha
+        t2 = (scaled_abs_errors / abs(alpha - 2) + 1) ** (alpha / 2) - 1
+        out = t1 * t2
     i_neg = errors < 0
     out[i_neg] = -1 * out[i_neg]
     return scale * out
