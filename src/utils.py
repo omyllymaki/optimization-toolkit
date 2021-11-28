@@ -62,3 +62,25 @@ def ieq_constraint_penalty(f_constraint: Callable, x: np.ndarray, penalty_parame
     @return: penalty.
     """
     return penalty_parameter * max(0, f_constraint(x)) ** 2
+
+
+def generalized_robust_kernel(errors: np.ndarray, alpha: float, scale: float) -> np.ndarray:
+    """
+    Generalized robust kernel to be applied directly on errors.
+
+    @param errors: Error values.
+    @param alpha:  Shape parameter.
+    @param scale: Size of quadratic loss region around zero errors.
+    @return: Generalized robust loss errors.
+    """
+    if alpha >= 2:
+        return errors
+    if alpha == 0:
+        raise Exception("Generalized robust kernel is not defined when alpha=0")
+    scaled_abs_errors = abs(errors) / scale
+    t1 = np.abs(alpha - 2) / alpha
+    t2 = (scaled_abs_errors / abs(alpha - 2) + 1) ** (alpha / 2) - 1
+    out = t1 * t2
+    i_neg = errors < 0
+    out[i_neg] = -1 * out[i_neg]
+    return scale * out

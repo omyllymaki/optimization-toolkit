@@ -8,11 +8,12 @@ from scipy.spatial.transform import Rotation as R
 
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 from src.termination import check_n_iter, check_absolute_cost_diff
+from src.utils import generalized_robust_kernel
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
 
-NOISE = 0.00
+NOISE = 0.0
 N_OUTLIERS = 10
 
 
@@ -48,27 +49,10 @@ def calculate_distances(source, target):
     return np.linalg.norm(diff, axis=1)
 
 
-def linear(errors):
-    return errors
-
-
-def soft_l1(errors, eps=0):
-    abs_errors = abs(errors)
-    abs_errors[abs_errors < eps] = eps
-    rho = 2 * ((1 + abs_errors) ** 0.5 - 1)
-    return rho
-
-
-def cauchy(errors, eps=0):
-    abs_errors = abs(errors)
-    abs_errors[abs_errors < eps] = eps
-    return np.log(1 + abs_errors)
-
-
-def f_err(param, source, target, loss=soft_l1):
+def f_err(param, source, target, loss_alpha=1.0, loss_scale=1.0):
     source_transformed = f_eval(source, param)
     diff = (source_transformed - target).reshape(-1)
-    return loss(diff)
+    return generalized_robust_kernel(diff, alpha=loss_alpha, scale=loss_scale)
 
 
 def main():
@@ -84,7 +68,7 @@ def main():
             partial(check_n_iter, threshold=500),
             partial(check_absolute_cost_diff, threshold=1e-9)
         )
-        fe = partial(f_err, source=source, target=target, loss=cauchy)
+        fe = partial(f_err, source=source, target=target, loss_alpha=1.0, loss_scale=1e-2)
         optimizer = LevenbergMarquardt(f_err=fe, termination_checks=termination_checks)
         t1 = time.time()
         output = optimizer.run(init_guess)
