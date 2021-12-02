@@ -2,6 +2,9 @@
 
 Home for different numerical optimization algos written in Python from scratch.
 
+The purpose of this project is to present inner workings of algorithms in a transparent way, with only one low-level
+linear algebra library (numpy) as dependency.
+
 ## Requirements
 
 - Python 3.6
@@ -108,10 +111,10 @@ Sample: samples/sample_penalty_method.py:
 <img src="samples/screenshots/constrained_optimization_penalty_method.jpg" width="800px" />
 </p>
 
-### Robust curve fitting using iteratively reweighted least squares
+### Robust fitting with generalized robust kernels
 
-Sample: samples/sample_gn_weighted_robust_ls.py:
+Sample: samples/sample_lma_different_loss_functions.py:
 
 <p align="center">
-<img src="samples/screenshots/robust_curve_fitting_irls.jpg" width="800px" />
+<img src="samples/screenshots/generalized_robust_kernels.jpg" width="800px" />
 </p>

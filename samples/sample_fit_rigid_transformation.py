@@ -1,14 +1,17 @@
 import logging
 import time
+from enum import Enum
 from functools import partial
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
+from src.local_optimization.gauss_newton import GaussNewton
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
-from src.termination import check_n_iter, check_absolute_cost_diff
-from src.utils import generalized_robust_loss
+from src.local_optimization.nelder_mead import NelderMead
+from src.termination import check_n_iter, check_absolute_cost_diff, check_n_iter_without_improvement
+from src.utils import generalized_robust_kernel, mse
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
@@ -52,10 +55,19 @@ def calculate_distances(source, target):
 def f_err(param, source, target, loss_alpha=1.0, loss_scale=1.0):
     source_transformed = f_eval(source, param)
     diff = (source_transformed - target).reshape(-1)
-    return generalized_robust_loss(diff, alpha=loss_alpha, scale=loss_scale)
+    return generalized_robust_kernel(diff, alpha=loss_alpha, scale=loss_scale)
+
+
+def f_cost(param, source, target, loss_alpha=1.0, loss_scale=1.0):
+    errors = f_err(param, source, target, loss_alpha=loss_alpha, loss_scale=loss_scale)
+    return mse(errors)
+
+
+OptimizerType = Enum('Optimizer', 'lma gn nm')
 
 
 def main():
+    optimizer_type = OptimizerType.nm
     for k in range(9):
         source = np.random.randn(50, 3)
         param_true = np.array([0, 0, 0.5, 5, 6, 0])
@@ -64,12 +76,36 @@ def main():
         target[:N_OUTLIERS] = target[:N_OUTLIERS] + np.array([5, 5, 0])
 
         init_guess = np.zeros(6)
-        termination_checks = (
-            partial(check_n_iter, threshold=500),
-            partial(check_absolute_cost_diff, threshold=1e-9)
-        )
-        fe = partial(f_err, source=source, target=target, loss_alpha=1.0, loss_scale=1e-2)
-        optimizer = LevenbergMarquardt(f_err=fe, termination_checks=termination_checks)
+        if optimizer_type == OptimizerType.gn:
+            termination_checks = (
+                partial(check_n_iter, threshold=500),
+                partial(check_absolute_cost_diff, threshold=1e-9)
+            )
+            fe = partial(f_err, source=source, target=target, loss_alpha=1.0, loss_scale=1e-2)
+            optimizer = GaussNewton(f_err=fe,
+                                    termination_checks=termination_checks,
+                                    step_size_ub=0,
+                                    step_size_lb=1.0,
+                                    step_size_max_iter=2)
+        elif optimizer_type == OptimizerType.lma:
+            termination_checks = (
+                partial(check_n_iter, threshold=500),
+                partial(check_absolute_cost_diff, threshold=1e-9)
+            )
+            fe = partial(f_err, source=source, target=target, loss_alpha=1.0, loss_scale=1e-2)
+            optimizer = LevenbergMarquardt(f_err=fe,
+                                           termination_checks=termination_checks,
+                                           )
+        elif optimizer_type == OptimizerType.nm:
+            termination_checks = (
+                partial(check_n_iter, threshold=1000),
+                partial(check_n_iter_without_improvement, threshold=50)
+            )
+            fc = partial(f_cost, source=source, target=target, loss_alpha=1.0, loss_scale=1e-2)
+            optimizer = NelderMead(f_cost=fc, termination_checks=termination_checks)
+        else:
+            raise Exception("Unsupported optimizer type")
+
         t1 = time.time()
         output = optimizer.run(init_guess)
         t2 = time.time()

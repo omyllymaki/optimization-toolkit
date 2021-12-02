@@ -64,7 +64,9 @@ def ieq_constraint_penalty(f_constraint: Callable, x: np.ndarray, penalty_parame
     return penalty_parameter * max(0, f_constraint(x)) ** 2
 
 
-def generalized_robust_loss(errors: np.ndarray, alpha: float, scale: float) -> np.ndarray:
+def generalized_robust_kernel(errors: np.ndarray,
+                              alpha: float,
+                              scale: float) -> np.ndarray:
     """
     Generalized robust losses, based on kernel specification.
 
@@ -85,4 +87,4 @@ def generalized_robust_loss(errors: np.ndarray, alpha: float, scale: float) -> n
     out = np.sqrt(out)
     i_neg = errors < 0
     out[i_neg] = -1 * out[i_neg]
-    return scale ** 2 * out
+    return out

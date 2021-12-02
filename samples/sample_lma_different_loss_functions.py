@@ -6,8 +6,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
-from src.termination import check_n_iter
-from src.utils import generalized_robust_loss
+from src.termination import check_n_iter_without_improvement
+from src.utils import generalized_robust_kernel
 
 logging.basicConfig(level=logging.INFO)
 warnings.filterwarnings("ignore")
@@ -28,7 +28,7 @@ def f_eval(x, coeff):
 def f_err(param, x, y, loss_alpha, loss_scale=1.0):
     y_estimate = f_eval(x, param)
     diff = y_estimate - y
-    return generalized_robust_loss(diff, loss_alpha, loss_scale)
+    return generalized_robust_kernel(diff, loss_alpha, loss_scale)
 
 
 def main():
@@ -53,11 +53,11 @@ def main():
     plt.plot(x, y_noisy, "k.", label="Noisy signal")
 
     init_guess = np.zeros(3)
-    termination_checks = partial(check_n_iter, threshold=200)
+    termination_checks = partial(check_n_iter_without_improvement, threshold=10)
 
     alphas = [2, 1.5, 1, 0, -1]
     for alpha in alphas:
-        fe = partial(f_err, x=x, y=y_noisy, loss_scale=1.0, loss_alpha=alpha)
+        fe = partial(f_err, x=x, y=y_noisy, loss_scale=5.0, loss_alpha=alpha)
         optimizer = LevenbergMarquardt(f_err=fe, termination_checks=termination_checks)
         output = optimizer.run(init_guess)
         y_estimate = f_eval(x, output.x)
@@ -66,13 +66,17 @@ def main():
         plt.subplot(1, 2, 1)
         plt.plot(x, y_estimate, label=f"alpha {alpha}", linewidth=2.0)
         plt.legend()
+        plt.title("Fit with different alphas; scale = 5")
+        plt.ylabel("y")
         plt.subplot(2, 2, 2)
         plt.plot(output.costs, label=f"alpha {alpha}", linewidth=2.0)
         plt.legend()
         plt.yscale("log")
+        plt.ylabel("cost")
         plt.subplot(2, 2, 4)
         plt.plot(y_estimate - y, label=f"alpha {alpha}", linewidth=2.0)
         plt.legend()
+        plt.ylabel("y error")
 
     scales = [1e3, 100, 10, 1, 0.1, 0.01]
     for scale in scales:
@@ -85,13 +89,17 @@ def main():
         plt.subplot(1, 2, 1)
         plt.plot(x, y_estimate, label=f"scale {scale}", linewidth=2.0)
         plt.legend()
+        plt.title("Fit with different scales; alpha = 1")
+        plt.ylabel("y")
         plt.subplot(2, 2, 2)
         plt.plot(output.costs, label=f"scale {scale}", linewidth=2.0)
         plt.legend()
         plt.yscale("log")
+        plt.ylabel("cost")
         plt.subplot(2, 2, 4)
         plt.plot(y_estimate - y, label=f"scale {scale}", linewidth=2.0)
         plt.legend()
+        plt.ylabel("y error")
     plt.show()
 
 
