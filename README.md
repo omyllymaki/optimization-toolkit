@@ -55,6 +55,14 @@ Currently, following optimization methods are supported:
 
 All the methods can be configured flexibly with callbacks.
 
+## Loss
+
+By modifying loss or error function to be minimized, you can use
+- Constrained optimization via penalty method
+- Iteratively reweighted least squares, for e.g. robust fitting
+
+src/loss.py provides some utils for this.
+
 ## Usage
 
 ### Minimal minimization problem
