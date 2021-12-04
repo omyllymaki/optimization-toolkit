@@ -8,7 +8,8 @@ from numpy.linalg import pinv
 from src.local_optimization.gss import gss
 from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
-from src.utils import gradient, mse
+from src.math import gradient
+from src.loss import mse
 
 logger = logging.getLogger(__name__)
 

@@ -7,7 +7,7 @@ import numpy as np
 from src.local_optimization.gss import gss
 from src.local_optimization.local_optimizer import LocalOptimizer
 from src.termination import check_n_iter, check_absolute_cost, check_n_iter_without_improvement
-from src.utils import gradient
+from src.math import gradient
 
 logger = logging.getLogger(__name__)
 

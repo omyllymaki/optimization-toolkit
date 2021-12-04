@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from src.local_optimization.nelder_mead import NelderMead
 from src.termination import check_n_iter, check_n_iter_without_improvement
-from src.utils import eq_constraint_penalty, ieq_constraint_penalty
+from src.loss import eq_constraint_penalty, ieq_constraint_penalty
 
 logging.basicConfig(level=logging.INFO)
 

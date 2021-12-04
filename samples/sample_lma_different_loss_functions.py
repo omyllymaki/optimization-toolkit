@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 from src.termination import check_n_iter_without_improvement
-from src.utils import generalized_robust_kernel
+from src.loss import generalized_robust_kernel
 
 logging.basicConfig(level=logging.INFO)
 warnings.filterwarnings("ignore")

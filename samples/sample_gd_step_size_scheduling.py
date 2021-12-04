@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from src.local_optimization.gradient_descent import GradientDescent
 from src.termination import check_n_iter
-from src.utils import mse
+from src.loss import mse
 
 logging.basicConfig(level=logging.INFO)
 

@@ -11,7 +11,7 @@ from src.local_optimization.gauss_newton import GaussNewton
 from src.local_optimization.levenberg_marquardt import LevenbergMarquardt
 from src.local_optimization.nelder_mead import NelderMead
 from src.termination import check_n_iter, check_absolute_cost_diff, check_n_iter_without_improvement
-from src.utils import generalized_robust_kernel, mse
+from src.loss import mse, generalized_robust_kernel
 
 logging.basicConfig(level=logging.INFO)
 np.random.seed(42)
@@ -67,7 +67,7 @@ OptimizerType = Enum('Optimizer', 'lma gn nm')
 
 
 def main():
-    optimizer_type = OptimizerType.nm
+    optimizer_type = OptimizerType.gn
     for k in range(9):
         source = np.random.randn(50, 3)
         param_true = np.array([0, 0, 0.5, 5, 6, 0])
